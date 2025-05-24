@@ -38,30 +38,30 @@ const SignupPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex">
-      <Link to="/" className="absolute top-8 left-8 flex items-center text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+      <Link to="/" className="absolute top-8 left-8 flex items-center text-white hover:text-white/90 transition-colors">
         <ArrowLeft size={16} className="mr-2" />
         Back to home
       </Link>
       
-      <div className="flex-1 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="flex-1 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-blue-600 to-blue-700">
         <div className="mx-auto w-full max-w-md">
-          <h2 className="text-center text-3xl font-extrabold text-slate-900 dark:text-white">
+          <h2 className="text-center text-3xl font-extrabold text-white">
             Create your account
           </h2>
-          <p className="mt-2 text-center text-sm text-slate-600 dark:text-slate-400">
+          <p className="mt-2 text-center text-sm text-blue-100">
             Already have an account?{' '}
-            <Link to="/login" className="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300">
+            <Link to="/login" className="font-medium text-white hover:text-blue-200">
               Sign in
             </Link>
           </p>
         </div>
 
         <div className="mt-8 mx-auto w-full max-w-md">
-          <div className="bg-white dark:bg-slate-800 py-8 px-4 shadow-sm sm:rounded-lg sm:px-10 border border-slate-200 dark:border-slate-700">
+          <div className="bg-white/10 backdrop-blur-sm py-8 px-4 shadow-sm sm:rounded-lg sm:px-10 border border-white/20">
             <form className="space-y-6" onSubmit={handleSubmit}>
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                 <div>
-                  <label htmlFor="first-name" className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                  <label htmlFor="first-name" className="block text-sm font-medium text-white">
                     First name
                   </label>
                   <div className="mt-1">
@@ -73,13 +73,13 @@ const SignupPage: React.FC = () => {
                       required
                       value={formData.firstName}
                       onChange={handleChange}
-                      className="appearance-none block w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white sm:text-sm"
+                      className="appearance-none block w-full px-3 py-2 border border-white/20 rounded-md shadow-sm placeholder-white/50 focus:outline-none focus:ring-white focus:border-white bg-white/10 text-white sm:text-sm"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label htmlFor="last-name" className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                  <label htmlFor="last-name" className="block text-sm font-medium text-white">
                     Last name
                   </label>
                   <div className="mt-1">
@@ -91,14 +91,14 @@ const SignupPage: React.FC = () => {
                       required
                       value={formData.lastName}
                       onChange={handleChange}
-                      className="appearance-none block w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white sm:text-sm"
+                      className="appearance-none block w-full px-3 py-2 border border-white/20 rounded-md shadow-sm placeholder-white/50 focus:outline-none focus:ring-white focus:border-white bg-white/10 text-white sm:text-sm"
                     />
                   </div>
                 </div>
               </div>
 
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                <label htmlFor="email" className="block text-sm font-medium text-white">
                   Email address
                 </label>
                 <div className="mt-1">
@@ -110,13 +110,13 @@ const SignupPage: React.FC = () => {
                     required
                     value={formData.email}
                     onChange={handleChange}
-                    className="appearance-none block w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white sm:text-sm"
+                    className="appearance-none block w-full px-3 py-2 border border-white/20 rounded-md shadow-sm placeholder-white/50 focus:outline-none focus:ring-white focus:border-white bg-white/10 text-white sm:text-sm"
                   />
                 </div>
               </div>
 
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                <label htmlFor="password" className="block text-sm font-medium text-white">
                   Password
                 </label>
                 <div className="mt-1 relative">
@@ -128,11 +128,11 @@ const SignupPage: React.FC = () => {
                     required
                     value={formData.password}
                     onChange={handleChange}
-                    className="appearance-none block w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white sm:text-sm"
+                    className="appearance-none block w-full px-3 py-2 border border-white/20 rounded-md shadow-sm placeholder-white/50 focus:outline-none focus:ring-white focus:border-white bg-white/10 text-white sm:text-sm"
                   />
                   <button
                     type="button"
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-500 dark:hover:text-slate-300"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-white/70 hover:text-white"
                     onClick={() => setShowPassword(!showPassword)}
                   >
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -147,22 +147,27 @@ const SignupPage: React.FC = () => {
                   type="checkbox"
                   checked={agreeTerms}
                   onChange={(e) => setAgreeTerms(e.target.checked)}
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-300 dark:border-slate-600 rounded"
+                  className="h-4 w-4 text-blue-600 focus:ring-white border-white/20 rounded bg-white/10"
                 />
-                <label htmlFor="agree-terms" className="ml-2 block text-sm text-slate-700 dark:text-slate-300">
+                <label htmlFor="agree-terms" className="ml-2 block text-sm text-white">
                   I agree to the{' '}
-                  <a href="#" className="text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300">
+                  <a href="#" className="font-medium text-white hover:text-blue-200">
                     Terms of Service
                   </a>{' '}
                   and{' '}
-                  <a href="#" className="text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300">
+                  <a href="#" className="font-medium text-white hover:text-blue-200">
                     Privacy Policy
                   </a>
                 </label>
               </div>
 
               <div>
-                <Button type="submit" fullWidth disabled={!agreeTerms}>
+                <Button 
+                  type="submit" 
+                  fullWidth 
+                  disabled={!agreeTerms}
+                  className="bg-white text-blue-600 hover:bg-blue-50"
+                >
                   Create account
                 </Button>
               </div>
@@ -171,24 +176,21 @@ const SignupPage: React.FC = () => {
         </div>
       </div>
       
-      <div className="hidden lg:block relative w-0 flex-1">
-        <div className="absolute inset-0 h-full w-full bg-gradient-to-r from-blue-600 to-blue-700">
-          <div className="absolute inset-0 bg-slate-900 opacity-20"></div>
-          <div className="flex flex-col justify-center h-full max-w-lg mx-auto px-8 text-white">
-            <div className="flex justify-center mb-12">
-              <Logo size={80} showText={false} />
-            </div>
-            <h2 className="text-3xl font-bold mb-8">Join Clashsense Today</h2>
-            <div className="space-y-4">
-              {benefits.map((benefit, index) => (
-                <div key={index} className="flex items-start">
-                  <div className="flex-shrink-0">
-                    <CheckCircle className="h-6 w-6 text-blue-300" />
-                  </div>
-                  <p className="ml-3 text-lg text-blue-50">{benefit}</p>
+      <div className="hidden lg:block relative w-0 flex-1 bg-white dark:bg-slate-800">
+        <div className="flex flex-col justify-center h-full max-w-lg mx-auto px-8">
+          <div className="flex justify-center mb-12">
+            <Logo size={80} showText={false} />
+          </div>
+          <h2 className="text-3xl font-bold mb-8 text-slate-900 dark:text-white">Join Clashsense Today</h2>
+          <div className="space-y-4">
+            {benefits.map((benefit, index) => (
+              <div key={index} className="flex items-start">
+                <div className="flex-shrink-0">
+                  <CheckCircle className="h-6 w-6 text-blue-500" />
                 </div>
-              ))}
-            </div>
+                <p className="ml-3 text-lg text-slate-600 dark:text-slate-300">{benefit}</p>
+              </div>
+            ))}
           </div>
         </div>
       </div>
