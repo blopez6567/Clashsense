@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Card, { CardHeader, CardContent } from '../ui/Card';
-import { CheckCircle2, AlertCircle, Filter, ChevronRight, AlertTriangle } from 'lucide-react';
+import { CheckCircle2, Filter, ChevronRight, AlertTriangle } from 'lucide-react';
 import Button from '../ui/Button';
 
 interface ClashTask {
@@ -251,7 +251,6 @@ const ClashTodoList: React.FC = () => {
                         : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
                     }`}
                   >
-                    <AlertTriangle size={14} className="mr-1" />
                     {priority.label}
                     <span className="ml-2 px-1.5 py-0.5 text-xs rounded-full bg-slate-200 dark:bg-slate-700">
                       {getPriorityTaskCount(priority.value)}
@@ -288,10 +287,8 @@ const ClashTodoList: React.FC = () => {
                   </p>
                 </div>
                 <div className="ml-4">
-                  {task.status === 'resolved' ? (
+                  {task.status === 'resolved' && (
                     <CheckCircle2 className="text-emerald-500" size={20} />
-                  ) : (
-                    <AlertCircle className="text-amber-500" size={20} />
                   )}
                 </div>
               </div>
