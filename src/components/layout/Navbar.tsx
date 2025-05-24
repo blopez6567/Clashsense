@@ -47,7 +47,10 @@ const Navbar: React.FC = () => {
         <div className="flex items-center justify-between h-16">
           <div className="flex-shrink-0">
             <Link to="/" className="flex items-center">
-              <Logo size={64} showText={false} />
+              <Logo size={64} logoPath="/images/Clash Sense Logo No Text PNG No Background.png" />
+              <span className="ml-2 text-xl font-semibold text-white">
+                Clash<span className="text-blue-500">sense</span>
+              </span>
             </Link>
           </div>
           
