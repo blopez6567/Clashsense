@@ -7,24 +7,15 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview",
-    "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
-    "web": "expo start --web"
+    "preview": "vite preview"
   },
   "dependencies": {
-    "expo": "^50.0.0",
-    "expo-status-bar": "~1.11.1",
     "fast-xml-parser": "^4.3.5",
     "lucide-react": "^0.344.0",
     "openai": "^4.28.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-native": "0.73.4",
-    "react-native-web": "~0.19.6",
-    "react-router-dom": "^6.22.3",
-    "react-router-native": "^6.22.3"
+    "react-router-dom": "^6.22.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.1",
@@ -35,7 +26,6 @@
     "eslint": "^9.9.1",
     "eslint-plugin-react-hooks": "^5.1.0-rc.0",
     "eslint-plugin-react-refresh": "^0.4.11",
-    "expo-cli": "^6.3.10",
     "globals": "^15.9.0",
     "postcss": "^8.4.35",
     "tailwindcss": "^3.4.1",
