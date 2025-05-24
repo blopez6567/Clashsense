@@ -5,6 +5,7 @@ import CoordinationGoals from '../components/dashboard/CoordinationGoals';
 import RecentUpdates from '../components/dashboard/RecentUpdates';
 import XmlViewer from '../components/dashboard/XmlViewer';
 import ClashTodoList from '../components/dashboard/ClashTodoList';
+import ClashProgressTracker from '../components/dashboard/ClashProgressTracker';
 
 const DashboardPage: React.FC = () => {
   // Update document title when component mounts
@@ -39,7 +40,14 @@ const DashboardPage: React.FC = () => {
             </div>
           </div>
           
-          <ClashTodoList />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+              <ClashTodoList />
+            </div>
+            <div className="lg:col-span-1">
+              <ClashProgressTracker />
+            </div>
+          </div>
           
           <XmlViewer />
           
