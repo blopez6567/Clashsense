@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Eye, EyeOff, ArrowLeft, CheckCircle } from 'lucide-react';
-import Logo from '../ui/Logo';
-import Button from '../ui/Button';
+import Logo from '../components/ui/Logo';
+import Button from '../components/ui/Button';
 
 const SignupPage: React.FC = () => {
   const [formData, setFormData] = useState({
