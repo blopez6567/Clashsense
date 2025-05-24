@@ -96,6 +96,93 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({ onProjectChange }) =>
         EL: { total: 61, resolved: 52 },
         FP: { total: 33, resolved: 26 }
       }
+    },
+    {
+      id: '4',
+      name: 'Residential Complex Phase 1',
+      client: 'Urban Living Developers',
+      lastUpdated: '2024-03-12',
+      teamSize: 25,
+      progress: 35,
+      phase: 'Schematic Design',
+      deadline: '2025-02-28',
+      image: 'https://images.pexels.com/photos/323705/pexels-photo-323705.jpeg',
+      modelStats: {
+        total: 28,
+        updated: 20,
+        reviewing: 8
+      },
+      clashStats: {
+        total: 145,
+        critical: 32,
+        major: 58,
+        minor: 55,
+        resolved: 42
+      },
+      disciplineProgress: {
+        MECH: { total: 38, resolved: 12 },
+        PL: { total: 32, resolved: 10 },
+        EL: { total: 45, resolved: 15 },
+        FP: { total: 30, resolved: 5 }
+      }
+    },
+    {
+      id: '5',
+      name: 'Shopping Mall Renovation',
+      client: 'Retail Solutions Inc.',
+      lastUpdated: '2024-03-11',
+      teamSize: 30,
+      progress: 72,
+      phase: 'Construction Documentation',
+      deadline: '2024-09-15',
+      image: 'https://images.pexels.com/photos/1579739/pexels-photo-1579739.jpeg',
+      modelStats: {
+        total: 42,
+        updated: 38,
+        reviewing: 4
+      },
+      clashStats: {
+        total: 167,
+        critical: 18,
+        major: 72,
+        minor: 77,
+        resolved: 120
+      },
+      disciplineProgress: {
+        MECH: { total: 48, resolved: 35 },
+        PL: { total: 35, resolved: 28 },
+        EL: { total: 55, resolved: 40 },
+        FP: { total: 29, resolved: 17 }
+      }
+    },
+    {
+      id: '6',
+      name: 'Research Facility Expansion',
+      client: 'BioTech Research Labs',
+      lastUpdated: '2024-03-10',
+      teamSize: 38,
+      progress: 55,
+      phase: 'Design Development',
+      deadline: '2024-11-30',
+      image: 'https://images.pexels.com/photos/2098624/pexels-photo-2098624.jpeg',
+      modelStats: {
+        total: 51,
+        updated: 43,
+        reviewing: 8
+      },
+      clashStats: {
+        total: 212,
+        critical: 38,
+        major: 85,
+        minor: 89,
+        resolved: 115
+      },
+      disciplineProgress: {
+        MECH: { total: 58, resolved: 32 },
+        PL: { total: 42, resolved: 23 },
+        EL: { total: 65, resolved: 35 },
+        FP: { total: 47, resolved: 25 }
+      }
     }
   ];
 
@@ -107,7 +194,7 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({ onProjectChange }) =>
   return (
     <div className="space-y-4">
       <h2 className="text-xl font-semibold text-slate-900 dark:text-white mb-6">Projects</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-h-[calc(100vh-200px)] overflow-y-auto pr-2">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-h-[calc(100vh-200px)] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-600 scrollbar-track-transparent">
         {projects.map((project) => (
           <button
             key={project.id}
