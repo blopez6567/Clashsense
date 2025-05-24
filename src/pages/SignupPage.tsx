@@ -15,7 +15,7 @@ const SignupPage: React.FC = () => {
   const [agreeTerms, setAgreeTerms] = useState(false);
 
   React.useEffect(() => {
-    document.title = 'Sign Up | Clashsense';
+    document.title = 'Sign Up | ClashSense';
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -181,12 +181,12 @@ const SignupPage: React.FC = () => {
           <div className="mb-2">
             <img 
               src="/images/Clash Sense Logo No Text PNG.png"
-              alt="Clashsense Logo"
+              alt="ClashSense Logo"
               className="w-[400px] h-auto"
             />
           </div>
           <h2 className="text-3xl font-bold mb-2 text-slate-900 dark:text-white text-center">
-            Join Clash<span className="text-blue-500">sense</span> Today
+            Join Clash<span className="text-blue-500">Sense</span> Today
           </h2>
           <div className="space-y-4 w-full max-w-md">
             {benefits.map((benefit, index) => (
