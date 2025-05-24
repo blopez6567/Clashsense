@@ -37,7 +37,7 @@ const LoginPage: React.FC = () => {
         </h2>
         <p className="mt-2 text-center text-sm text-slate-600 dark:text-slate-400">
           Don't have an account?{' '}
-          <Link to="/signup" className="font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-500 dark:hover:text-emerald-300">
+          <Link to="/signup" className="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300">
             Sign up
           </Link>
         </p>
@@ -105,7 +105,7 @@ const LoginPage: React.FC = () => {
               </div>
 
               <div className="text-sm">
-                <a href="#" className="font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-500 dark:hover:text-emerald-300">
+                <a href="#" className="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300">
                   Forgot your password?
                 </a>
               </div>
