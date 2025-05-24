@@ -179,7 +179,7 @@ const SignupPage: React.FC = () => {
       <div className="hidden lg:block relative w-0 flex-1 bg-white dark:bg-slate-800">
         <div className="flex flex-col justify-center h-full max-w-lg mx-auto px-8">
           <div className="flex justify-center mb-12">
-            <Logo size={80} showText={false} />
+            <Logo size={320} showText={false} />
           </div>
           <h2 className="text-3xl font-bold mb-8 text-slate-900 dark:text-white">Join Clashsense Today</h2>
           <div className="space-y-4">
