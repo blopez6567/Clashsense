@@ -12,7 +12,7 @@ const Footer: React.FC = () => {
             <Link to="/" className="flex items-center">
               <Logo size={48} logoPath="/images/Clash Sense Logo No Text PNG No Background.png" />
               <span className="ml-2 text-xl font-semibold">
-                Clash<span className="text-blue-600">sense</span>
+                Clash<span className="text-blue-600">Sense</span>
               </span>
             </Link>
             <p className="mt-4 text-sm text-slate-600 dark:text-slate-400 max-w-xs">
@@ -65,15 +65,15 @@ const Footer: React.FC = () => {
               <li><a href="#" className="text-sm text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400">Help Center</a></li>
               <li><a href="#" className="text-sm text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400">Contact Us</a></li>
               <li><a href="#" className="text-sm text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400">FAQs</a></li>
-              <li><a href="#" className="text-sm text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400">Privacy Policy</a></li>
-              <li><a href="#" className="text-sm text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400">Terms of Service</a></li>
+              <li><Link to="/terms" className="text-sm text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400">Privacy Policy</Link></li>
+              <li><Link to="/terms" className="text-sm text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400">Terms of Service</Link></li>
             </ul>
           </div>
         </div>
         
         <div className="mt-12 pt-8 border-t border-slate-200 dark:border-slate-700">
           <p className="text-center text-sm text-slate-500 dark:text-slate-400">
-            &copy; {new Date().getFullYear()} Clashsense. All rights reserved.
+            &copy; {new Date().getFullYear()} ClashSense. All rights reserved.
           </p>
         </div>
       </div>
