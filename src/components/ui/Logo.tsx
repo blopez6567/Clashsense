@@ -4,22 +4,20 @@ interface LogoProps {
   size?: number;
   showText?: boolean;
   className?: string;
-  logoPath?: string;
 }
 
 const Logo: React.FC<LogoProps> = ({ 
   size = 32, 
   showText = true,
-  className = '',
-  logoPath
+  className = ''
 }) => {
-  const defaultLogoPath = showText 
+  const logoPath = showText 
     ? '/images/Clash Sense Logo PNG.png'
-    : '/images/Clash Sense Logo No Text PNG.png';
+    : '/images/Clash Sense Logo No Text PNG No Background.png';
 
   return (
     <img 
-      src={logoPath || defaultLogoPath}
+      src={logoPath}
       alt="Clashsense Logo" 
       className={`h-auto ${className}`}
       style={{ width: size }}
