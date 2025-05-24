@@ -1,44 +1,12 @@
-import React, { useState } from 'react';
-import { ChevronDown, Building2, Calendar, Users2, Clock } from 'lucide-react';
-import Card from '../ui/Card';
-
-export interface ProjectData {
-  id: string;
-  name: string;
-  client: string;
-  lastUpdated: string;
-  teamSize: number;
-  progress: number;
-  phase: string;
-  deadline: string;
-  image: string;
-  modelStats: {
-    total: number;
-    updated: number;
-    reviewing: number;
-  };
-  clashStats: {
-    total: number;
-    critical: number;
-    major: number;
-    minor: number;
-    resolved: number;
-  };
-  disciplineProgress: {
-    MECH: { total: number; resolved: number; };
-    PL: { total: number; resolved: number; };
-    EL: { total: number; resolved: number; };
-    FP: { total: number; resolved: number; };
-  };
-}
+import React from 'react';
+import { Users2, Calendar, Clock } from 'lucide-react';
+import { ProjectData } from '../../types';
 
 interface ProjectSelectorProps {
   onProjectChange: (project: ProjectData) => void;
 }
 
 const ProjectSelector: React.FC<ProjectSelectorProps> = ({ onProjectChange }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  
   const projects: ProjectData[] = [
     {
       id: '1',
@@ -129,100 +97,63 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({ onProjectChange }) =>
     }
   ];
 
-  const [selectedProject, setSelectedProject] = useState<ProjectData>(projects[0]);
-
-  const handleProjectSelect = (project: ProjectData) => {
-    setSelectedProject(project);
-    setIsOpen(false);
-    onProjectChange(project);
-  };
-
   return (
-    <div className="relative">
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between p-4 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
-      >
-        <div className="flex items-center space-x-4">
-          <div className="relative w-16 h-16 rounded-lg overflow-hidden">
-            <img 
-              src={selectedProject.image} 
-              alt={selectedProject.name}
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
-          </div>
-          <div className="text-left">
-            <h3 className="font-medium text-slate-900 dark:text-white">{selectedProject.name}</h3>
-            <div className="flex items-center mt-1 space-x-3 text-sm text-slate-500 dark:text-slate-400">
-              <span>{selectedProject.client}</span>
-              <span>•</span>
-              <span className="flex items-center">
-                <Clock className="h-4 w-4 mr-1" />
-                {selectedProject.phase}
-              </span>
+    <div className="space-y-4">
+      <h2 className="text-xl font-semibold text-slate-900 dark:text-white mb-6">Projects</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-h-[calc(100vh-200px)] overflow-y-auto pr-2">
+        {projects.map((project) => (
+          <button
+            key={project.id}
+            onClick={() => onProjectChange(project)}
+            className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden hover:shadow-md transition-all duration-200 text-left"
+          >
+            <div className="relative h-48 w-full">
+              <img 
+                src={project.image} 
+                alt={project.name}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/30 to-transparent"></div>
+              <div className="absolute bottom-4 left-4 right-4">
+                <h3 className="text-lg font-semibold text-white">{project.name}</h3>
+                <p className="text-sm text-white/80">{project.client}</p>
+              </div>
             </div>
-          </div>
-        </div>
-        <ChevronDown className={`h-5 w-5 text-slate-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-      </button>
-
-      {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-2 z-50">
-          <Card>
-            <div className="max-h-[calc(100vh-200px)] overflow-y-auto divide-y divide-slate-200 dark:divide-slate-700">
-              {projects.map((project) => (
-                <button
-                  key={project.id}
-                  onClick={() => handleProjectSelect(project)}
-                  className={`w-full p-4 flex items-start space-x-4 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors ${
-                    project.id === selectedProject.id ? 'bg-slate-50 dark:bg-slate-700/50' : ''
-                  }`}
-                >
-                  <div className="relative w-24 h-24 rounded-lg overflow-hidden flex-shrink-0">
-                    <img 
-                      src={project.image} 
-                      alt={project.name}
-                      className="w-full h-full object-cover"
+            <div className="p-4">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center text-sm text-slate-600 dark:text-slate-400">
+                  <Users2 className="h-4 w-4 mr-1" />
+                  {project.teamSize} members
+                </div>
+                <div className="flex items-center text-sm text-slate-600 dark:text-slate-400">
+                  <Calendar className="h-4 w-4 mr-1" />
+                  {new Date(project.lastUpdated).toLocaleDateString()}
+                </div>
+              </div>
+              <div className="space-y-3">
+                <div>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span className="text-slate-600 dark:text-slate-400">Progress</span>
+                    <span className="font-medium text-slate-900 dark:text-white">{project.progress}%</span>
+                  </div>
+                  <div className="h-2 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-blue-500 rounded-full"
+                      style={{ width: `${project.progress}%` }}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
                   </div>
-                  <div className="flex-1 text-left">
-                    <h3 className="font-medium text-slate-900 dark:text-white">{project.name}</h3>
-                    <p className="text-sm text-slate-500 dark:text-slate-400">{project.client}</p>
-                    <div className="mt-2 flex items-center space-x-4 text-xs text-slate-500 dark:text-slate-400">
-                      <div className="flex items-center">
-                        <Calendar className="h-4 w-4 mr-1" />
-                        Updated {new Date(project.lastUpdated).toLocaleDateString()}
-                      </div>
-                      <div className="flex items-center">
-                        <Users2 className="h-4 w-4 mr-1" />
-                        {project.teamSize} team members
-                      </div>
-                      <div className="flex items-center">
-                        <Clock className="h-4 w-4 mr-1" />
-                        {project.phase}
-                      </div>
-                    </div>
-                    <div className="mt-2">
-                      <div className="flex items-center justify-between text-xs mb-1">
-                        <span className="text-slate-600 dark:text-slate-300">Progress</span>
-                        <span className="font-medium text-slate-900 dark:text-white">{project.progress}%</span>
-                      </div>
-                      <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1">
-                        <div
-                          className="bg-blue-500 h-1 rounded-full"
-                          style={{ width: `${project.progress}%` }}
-                        />
-                      </div>
-                    </div>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <div className="flex items-center text-slate-600 dark:text-slate-400">
+                    <Clock className="h-4 w-4 mr-1" />
+                    {project.phase}
                   </div>
-                </button>
-              ))}
+                </div>
+              </div>
             </div>
-          </Card>
-        </div>
-      )}
+          </button>
+        ))}
+      </div>
     </div>
   );
 };
