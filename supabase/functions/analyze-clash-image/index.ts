@@ -31,7 +31,7 @@ Deno.serve(async (req) => {
     const base64Image = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4-vision-preview-v2",
+      model: "gpt-4-vision-preview",
       messages: [
         {
           role: "system",
