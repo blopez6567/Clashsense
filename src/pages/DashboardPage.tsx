@@ -28,7 +28,7 @@ const DashboardPage: React.FC = () => {
   };
 
   return (
-    <div className="bg-slate-50 dark:bg-slate-900 min-h-screen pt-8 pb-12">
+    <div className="bg-slate-50 dark:bg-slate-900 min-h-screen pt-24 pb-12">
       <DashboardTour isFirstVisit={isFirstVisit} />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -117,5 +117,3 @@ const DashboardPage: React.FC = () => {
 };
 
 export default DashboardPage;
-
-export default DashboardPage
