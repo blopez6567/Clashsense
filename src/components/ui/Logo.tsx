@@ -13,7 +13,7 @@ const Logo: React.FC<LogoProps> = ({
 }) => {
   const logoPath = showText 
     ? '/images/Clash Sense Logo PNG.png'
-    : '/images/Clash Sense Logo No Text PNG No Background New.png';
+    : '/images/Clash Sense Logo No Text PNG No Background.png';
 
   return (
     <img 
