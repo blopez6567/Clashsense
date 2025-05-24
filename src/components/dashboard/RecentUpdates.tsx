@@ -21,6 +21,7 @@ const RecentUpdates: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
 
   const updates: Update[] = [
+    // Today's updates
     {
       id: 1,
       type: 'modification',
@@ -39,6 +40,7 @@ const RecentUpdates: React.FC = () => {
       timestamp: '2024-03-15T12:15:00',
       discipline: 'STRUCT'
     },
+    // Last Week
     {
       id: 3,
       type: 'issue',
@@ -57,13 +59,14 @@ const RecentUpdates: React.FC = () => {
       timestamp: '2024-03-14T09:20:00',
       discipline: 'PLUMB'
     },
+    // Last 2 Weeks
     {
       id: 5,
       type: 'modification',
       model: 'Electrical System',
       user: 'John Smith',
       action: 'Updated conduit routing in mechanical room',
-      timestamp: '2024-03-13T15:30:00',
+      timestamp: '2024-03-08T15:30:00',
       discipline: 'ELEC'
     },
     {
@@ -72,8 +75,45 @@ const RecentUpdates: React.FC = () => {
       model: 'Mechanical System',
       user: 'Lisa Wong',
       action: 'Identified ductwork clash with structural beam',
-      timestamp: '2024-03-13T11:45:00',
+      timestamp: '2024-03-07T11:45:00',
       discipline: 'MECH'
+    },
+    // Last Month
+    {
+      id: 7,
+      type: 'modification',
+      model: 'Plumbing System',
+      user: 'David Miller',
+      action: 'Rerouted main water supply line',
+      timestamp: '2024-02-28T10:15:00',
+      discipline: 'PLUMB'
+    },
+    {
+      id: 8,
+      type: 'merge',
+      model: 'Structural Model',
+      user: 'Rachel Adams',
+      action: 'Updated foundation details',
+      timestamp: '2024-02-25T14:20:00',
+      discipline: 'STRUCT'
+    },
+    {
+      id: 9,
+      type: 'resolution',
+      model: 'Mechanical System',
+      user: 'Tom Wilson',
+      action: 'Resolved AHU clearance issues',
+      timestamp: '2024-02-22T09:30:00',
+      discipline: 'MECH'
+    },
+    {
+      id: 10,
+      type: 'modification',
+      model: 'Electrical System',
+      user: 'Emily Chen',
+      action: 'Updated emergency lighting layout',
+      timestamp: '2024-02-20T16:45:00',
+      discipline: 'ELEC'
     }
   ];
 
