@@ -15,6 +15,7 @@ interface ClashOverviewProps {
 }
 
 const ClashOverview: React.FC<ClashOverviewProps> = ({ stats }) => {
+  const [isExpanded, setIsExpanded] = useState(true);
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
 
   const clashCategories = [
@@ -139,95 +140,100 @@ const ClashOverview: React.FC<ClashOverviewProps> = ({ stats }) => {
 
   return (
     <Card>
-      <CardHeader>
-        <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Clash Overview</h2>
+      <CardHeader className="cursor-pointer" onClick={() => setIsExpanded(!isExpanded)}>
+        <div className="flex justify-between items-center">
+          <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Clash Overview</h2>
+          {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+        </div>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-6">
-          {clashCategories.map((category) => (
-            <div key={category.severity}>
-              <div 
-                className="flex items-center cursor-pointer"
-                onClick={() => setExpandedCategory(expandedCategory === category.severity ? null : category.severity)}
-              >
-                <div className="flex-shrink-0">{category.icon}</div>
-                <div className="ml-4 flex-1">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                      {category.severity}
-                    </span>
-                    <span className="text-sm font-medium text-slate-900 dark:text-white">
-                      {category.count}
-                    </span>
+      {isExpanded && (
+        <CardContent>
+          <div className="space-y-6">
+            {clashCategories.map((category) => (
+              <div key={category.severity}>
+                <div 
+                  className="flex items-center cursor-pointer"
+                  onClick={() => setExpandedCategory(expandedCategory === category.severity ? null : category.severity)}
+                >
+                  <div className="flex-shrink-0">{category.icon}</div>
+                  <div className="ml-4 flex-1">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                        {category.severity}
+                      </span>
+                      <span className="text-sm font-medium text-slate-900 dark:text-white">
+                        {category.count}
+                      </span>
+                    </div>
+                    <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2">
+                      <div
+                        className={`${category.color} h-2 rounded-full`}
+                        style={{ width: `${(category.count / stats.total) * 100}%` }}
+                      ></div>
+                    </div>
+                    <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{category.description}</p>
                   </div>
-                  <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2">
-                    <div
-                      className={`${category.color} h-2 rounded-full`}
-                      style={{ width: `${(category.count / stats.total) * 100}%` }}
-                    ></div>
+                  <div className="ml-4">
+                    {expandedCategory === category.severity ? (
+                      <ChevronUp className="h-5 w-5 text-slate-400" />
+                    ) : (
+                      <ChevronDown className="h-5 w-5 text-slate-400" />
+                    )}
                   </div>
-                  <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{category.description}</p>
                 </div>
-                <div className="ml-4">
-                  {expandedCategory === category.severity ? (
-                    <ChevronUp className="h-5 w-5 text-slate-400" />
-                  ) : (
-                    <ChevronDown className="h-5 w-5 text-slate-400" />
-                  )}
-                </div>
-              </div>
 
-              {expandedCategory === category.severity && (
-                <div className="mt-4 ml-9 space-y-4">
-                  {category.details.map((detail, index) => (
-                    <div key={index} className="bg-slate-50 dark:bg-slate-800 rounded-lg p-4">
-                      <div className="flex justify-between items-start mb-3">
-                        <div>
-                          <h4 className="text-sm font-medium text-slate-900 dark:text-white">
-                            {detail.type}
-                          </h4>
-                          <span className="text-sm text-slate-500 dark:text-slate-400">
-                            {detail.count} issues
-                          </span>
+                {expandedCategory === category.severity && (
+                  <div className="mt-4 ml-9 space-y-4">
+                    {category.details.map((detail, index) => (
+                      <div key={index} className="bg-slate-50 dark:bg-slate-800 rounded-lg p-4">
+                        <div className="flex justify-between items-start mb-3">
+                          <div>
+                            <h4 className="text-sm font-medium text-slate-900 dark:text-white">
+                              {detail.type}
+                            </h4>
+                            <span className="text-sm text-slate-500 dark:text-slate-400">
+                              {detail.count} issues
+                            </span>
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          {detail.examples.map((example, i) => (
+                            <div key={i} className="flex items-start">
+                              <span className="h-1.5 w-1.5 rounded-full bg-slate-400 dark:bg-slate-600 mt-2 mr-2 flex-shrink-0"></span>
+                              <p className="text-sm text-slate-600 dark:text-slate-400">{example}</p>
+                            </div>
+                          ))}
                         </div>
                       </div>
-                      <div className="space-y-2">
-                        {detail.examples.map((example, i) => (
-                          <div key={i} className="flex items-start">
-                            <span className="h-1.5 w-1.5 rounded-full bg-slate-400 dark:bg-slate-600 mt-2 mr-2 flex-shrink-0"></span>
-                            <p className="text-sm text-slate-600 dark:text-slate-400">{example}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-8">
-          <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-4">Most Affected Areas</h3>
-          <div className="space-y-2">
-            {[
-              { area: 'Mechanical Room - Level 2', clashes: Math.round(stats.total * 0.3) },
-              { area: 'Main Corridor - Level 1', clashes: Math.round(stats.total * 0.25) },
-              { area: 'Operating Theaters', clashes: Math.round(stats.total * 0.2) },
-            ].map((item) => (
-              <div
-                key={item.area}
-                className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg"
-              >
-                <span className="text-sm text-slate-700 dark:text-slate-300">{item.area}</span>
-                <span className="text-sm font-medium text-slate-900 dark:text-white">
-                  {item.clashes} clashes
-                </span>
+                    ))}
+                  </div>
+                )}
               </div>
             ))}
           </div>
-        </div>
-      </CardContent>
+
+          <div className="mt-8">
+            <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-4">Most Affected Areas</h3>
+            <div className="space-y-2">
+              {[
+                { area: 'Mechanical Room - Level 2', clashes: Math.round(stats.total * 0.3) },
+                { area: 'Main Corridor - Level 1', clashes: Math.round(stats.total * 0.25) },
+                { area: 'Operating Theaters', clashes: Math.round(stats.total * 0.2) },
+              ].map((item) => (
+                <div
+                  key={item.area}
+                  className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg"
+                >
+                  <span className="text-sm text-slate-700 dark:text-slate-300">{item.area}</span>
+                  <span className="text-sm font-medium text-slate-900 dark:text-white">
+                    {item.clashes} clashes
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </CardContent>
+      )}
     </Card>
   );
 };
