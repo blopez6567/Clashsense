@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Eye, EyeOff, ArrowLeft, CheckCircle } from 'lucide-react';
-import Logo from '../components/ui/Logo';
-import Button from '../components/ui/Button';
+import Logo from '../ui/Logo';
+import Button from '../ui/Button';
 
 const SignupPage: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -155,8 +155,8 @@ const SignupPage: React.FC = () => {
                     Terms of Service
                   </Link>{' '}
                   and{' '}
-                  <Link to="/terms" className="font-medium text-blue-300 hover:text-blue-200">
-                    Privacy Policy
+                  <Link to="/privacy" className="font-medium text-blue-300 hover:text-blue-200">
+                    🔒 Privacy Policy
                   </Link>
                 </label>
               </div>
