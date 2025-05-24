@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Card, { CardHeader, CardContent } from '../ui/Card';
-import { CheckCircle2, AlertCircle, Filter } from 'lucide-react';
+import { CheckCircle2, AlertCircle, Filter, ChevronRight } from 'lucide-react';
 import Button from '../ui/Button';
 
 interface ClashTask {
@@ -15,6 +15,7 @@ interface ClashTask {
 const ClashTodoList: React.FC = () => {
   const [selectedDisciplines, setSelectedDisciplines] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
+  const [expandedDiscipline, setExpandedDiscipline] = useState<string | null>(null);
 
   const disciplines = [
     { code: 'MECH', name: 'Mechanical' },
@@ -23,7 +24,8 @@ const ClashTodoList: React.FC = () => {
     { code: 'FP', name: 'Fire Protection' }
   ];
 
-  const tasks: ClashTask[] = [
+  // Simulated larger dataset
+  const allTasks: ClashTask[] = [
     {
       id: '1',
       description: 'Ductwork interference with structural beam on Level 3',
@@ -55,20 +57,91 @@ const ClashTodoList: React.FC = () => {
       severity: 'medium',
       status: 'pending',
       location: 'Basement - Utility Room'
+    },
+    // Additional tasks per discipline
+    {
+      id: '5',
+      description: 'Return air duct clash with fire sprinkler main',
+      discipline: 'MECH',
+      severity: 'high',
+      status: 'pending',
+      location: 'Level 4 - Office Area'
+    },
+    {
+      id: '6',
+      description: 'Supply duct interference with lighting fixtures',
+      discipline: 'MECH',
+      severity: 'medium',
+      status: 'in-progress',
+      location: 'Level 2 - Open Office'
+    },
+    {
+      id: '7',
+      description: 'Waste stack conflict with structural column',
+      discipline: 'PL',
+      severity: 'high',
+      status: 'pending',
+      location: 'Level 3 - Restrooms'
+    },
+    {
+      id: '8',
+      description: 'Hot water line clash with return air duct',
+      discipline: 'PL',
+      severity: 'medium',
+      status: 'in-progress',
+      location: 'Level 1 - Mechanical Room'
+    },
+    {
+      id: '9',
+      description: 'Main switchgear clearance violation',
+      discipline: 'EL',
+      severity: 'high',
+      status: 'pending',
+      location: 'Basement - Electrical Room'
+    },
+    {
+      id: '10',
+      description: 'Emergency lighting conduit clash with ductwork',
+      discipline: 'EL',
+      severity: 'medium',
+      status: 'in-progress',
+      location: 'Level 2 - Corridor'
+    },
+    {
+      id: '11',
+      description: 'Sprinkler branch line conflict with cable tray',
+      discipline: 'FP',
+      severity: 'medium',
+      status: 'pending',
+      location: 'Level 3 - IT Room'
+    },
+    {
+      id: '12',
+      description: 'Fire main routing clash with structural beam',
+      discipline: 'FP',
+      severity: 'high',
+      status: 'in-progress',
+      location: 'Level 1 - Main Corridor'
     }
   ];
 
   const toggleDiscipline = (discipline: string) => {
-    setSelectedDisciplines(prev =>
-      prev.includes(discipline)
-        ? prev.filter(d => d !== discipline)
-        : [...prev, discipline]
-    );
+    if (expandedDiscipline === discipline) {
+      setExpandedDiscipline(null);
+    } else {
+      setExpandedDiscipline(discipline);
+      setSelectedDisciplines([discipline]);
+    }
   };
 
-  const filteredTasks = tasks.filter(task =>
-    selectedDisciplines.length === 0 || selectedDisciplines.includes(task.discipline)
+  const filteredTasks = allTasks.filter(task =>
+    expandedDiscipline 
+      ? task.discipline === expandedDiscipline
+      : selectedDisciplines.length === 0 || selectedDisciplines.includes(task.discipline)
   );
+
+  // Show only 4 tasks in preview mode
+  const displayedTasks = expandedDiscipline ? filteredTasks : filteredTasks.slice(0, 4);
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
@@ -83,19 +156,39 @@ const ClashTodoList: React.FC = () => {
     }
   };
 
+  const getDisciplineTaskCount = (discipline: string) => {
+    return allTasks.filter(task => task.discipline === discipline).length;
+  };
+
   return (
     <Card>
       <CardHeader>
         <div className="flex justify-between items-center">
-          <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Clash Resolution Tasks</h2>
-          <Button
-            variant="outline"
-            size="sm"
-            leftIcon={<Filter size={16} />}
-            onClick={() => setShowFilters(!showFilters)}
-          >
-            Filter by Discipline
-          </Button>
+          <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
+            {expandedDiscipline 
+              ? `${disciplines.find(d => d.code === expandedDiscipline)?.name} Clashes`
+              : 'Clash Resolution Tasks'
+            }
+          </h2>
+          <div className="flex items-center gap-2">
+            {expandedDiscipline && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setExpandedDiscipline(null)}
+              >
+                Back to Overview
+              </Button>
+            )}
+            <Button
+              variant="outline"
+              size="sm"
+              leftIcon={<Filter size={16} />}
+              onClick={() => setShowFilters(!showFilters)}
+            >
+              Filter by Discipline
+            </Button>
+          </div>
         </div>
         {showFilters && (
           <div className="mt-4 flex flex-wrap gap-2">
@@ -103,29 +196,24 @@ const ClashTodoList: React.FC = () => {
               <button
                 key={discipline.code}
                 onClick={() => toggleDiscipline(discipline.code)}
-                className={`px-3 py-1.5 text-sm font-medium rounded-full transition-colors ${
-                  selectedDisciplines.includes(discipline.code)
+                className={`px-3 py-1.5 text-sm font-medium rounded-full transition-colors flex items-center ${
+                  expandedDiscipline === discipline.code
                     ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200'
                     : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
                 }`}
               >
                 {discipline.code}
+                <span className="ml-2 px-1.5 py-0.5 text-xs rounded-full bg-slate-200 dark:bg-slate-700">
+                  {getDisciplineTaskCount(discipline.code)}
+                </span>
               </button>
             ))}
-            {selectedDisciplines.length > 0 && (
-              <button
-                onClick={() => setSelectedDisciplines([])}
-                className="px-3 py-1.5 text-sm font-medium rounded-full text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-              >
-                Clear filters
-              </button>
-            )}
           </div>
         )}
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {filteredTasks.map(task => (
+          {displayedTasks.map(task => (
             <div
               key={task.id}
               className="p-4 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700"
@@ -157,6 +245,14 @@ const ClashTodoList: React.FC = () => {
               </div>
             </div>
           ))}
+          
+          {!expandedDiscipline && filteredTasks.length > 4 && (
+            <div className="text-center pt-4">
+              <p className="text-sm text-slate-500 dark:text-slate-400">
+                Showing 4 of {filteredTasks.length} tasks. Select a discipline to view all.
+              </p>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>
