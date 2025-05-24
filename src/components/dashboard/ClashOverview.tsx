@@ -16,17 +16,32 @@ const ClashOverview: React.FC = () => {
         {
           type: 'Structural-MEP Interference',
           count: 12,
-          examples: 'Beam-ductwork conflicts, Column-pipe intersections'
+          examples: [
+            'Steel beam intersecting with main HVAC duct on Level 3',
+            'Column clashing with primary electrical conduit in utility room',
+            'Foundation conflicts with underground plumbing lines',
+            'Load-bearing wall interference with mechanical equipment'
+          ]
         },
         {
           type: 'Major Service Clashes',
           count: 8,
-          examples: 'Main duct-electrical busway conflicts, Primary structure-equipment clearance'
+          examples: [
+            'Main electrical busway conflicting with fire suppression main',
+            'Primary chilled water line intersection with structural bracing',
+            'Emergency generator exhaust routing through occupied space',
+            'Critical mechanical equipment clearance violations'
+          ]
         },
         {
           type: 'Emergency System Conflicts',
           count: 4,
-          examples: 'Fire suppression system obstructions, Emergency exit pathway conflicts'
+          examples: [
+            'Fire sprinkler main blocked by structural elements',
+            'Emergency exit pathway obstructed by mechanical equipment',
+            'Smoke evacuation duct conflicts with structural beams',
+            'Emergency lighting conduit clashing with HVAC ductwork'
+          ]
         }
       ]
     },
@@ -40,17 +55,32 @@ const ClashOverview: React.FC = () => {
         {
           type: 'MEP System Conflicts',
           count: 28,
-          examples: 'Duct-pipe intersections, Cable tray-ductwork conflicts'
+          examples: [
+            'Supply and return duct interference in ceiling space',
+            'Multiple pipe crossings in congested areas',
+            'Cable tray routing conflicts with mechanical systems',
+            'Ductwork clashing with sprinkler branch lines'
+          ]
         },
         {
           type: 'Equipment Access Issues',
           count: 22,
-          examples: 'Maintenance clearance violations, Access panel obstructions'
+          examples: [
+            'Insufficient clearance for AHU maintenance',
+            'Electrical panel access space violations',
+            'Valve access blocked by other services',
+            'Equipment removal pathway obstructions'
+          ]
         },
         {
           type: 'Installation Sequence Conflicts',
           count: 17,
-          examples: 'Installation space constraints, Service access conflicts'
+          examples: [
+            'Overlapping installation space requirements',
+            'Service access conflicts between trades',
+            'Complex system intersections requiring coordination',
+            'Installation clearance issues in tight spaces'
+          ]
         }
       ]
     },
@@ -64,17 +94,32 @@ const ClashOverview: React.FC = () => {
         {
           type: 'Insulation Clearance',
           count: 30,
-          examples: 'Pipe insulation overlaps, Duct insulation clearances'
+          examples: [
+            'Pipe insulation overlap in non-critical areas',
+            'Duct insulation clearance issues',
+            'Minor thermal barrier conflicts',
+            'Insulation compression points'
+          ]
         },
         {
           type: 'Non-critical Spacing',
           count: 20,
-          examples: 'Minor pipe spacing issues, Non-essential clearance violations'
+          examples: [
+            'Minor pipe spacing violations',
+            'Non-essential equipment clearance issues',
+            'Secondary system routing conflicts',
+            'Maintenance access optimization needed'
+          ]
         },
         {
           type: 'Aesthetic Conflicts',
           count: 15,
-          examples: 'Ceiling grid alignment, Visual coordination issues'
+          examples: [
+            'Ceiling grid alignment issues',
+            'Visible service coordination in public spaces',
+            'Fixture alignment discrepancies',
+            'Non-structural finish conflicts'
+          ]
         }
       ]
     },
@@ -124,18 +169,23 @@ const ClashOverview: React.FC = () => {
                 <div className="mt-4 ml-9 space-y-4">
                   {category.details.map((detail, index) => (
                     <div key={index} className="bg-slate-50 dark:bg-slate-800 rounded-lg p-4">
-                      <div className="flex justify-between items-start">
+                      <div className="flex justify-between items-start mb-3">
                         <div>
                           <h4 className="text-sm font-medium text-slate-900 dark:text-white">
                             {detail.type}
                           </h4>
-                          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                            {detail.examples}
-                          </p>
+                          <span className="text-sm text-slate-500 dark:text-slate-400">
+                            {detail.count} issues
+                          </span>
                         </div>
-                        <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                          {detail.count} issues
-                        </span>
+                      </div>
+                      <div className="space-y-2">
+                        {detail.examples.map((example, i) => (
+                          <div key={i} className="flex items-start">
+                            <span className="h-1.5 w-1.5 rounded-full bg-slate-400 dark:bg-slate-600 mt-2 mr-2 flex-shrink-0"></span>
+                            <p className="text-sm text-slate-600 dark:text-slate-400">{example}</p>
+                          </div>
+                        ))}
                       </div>
                     </div>
                   ))}
