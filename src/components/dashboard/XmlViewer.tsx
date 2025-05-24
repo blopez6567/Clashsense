@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { XMLParser } from 'fast-xml-parser';
 import Card, { CardHeader, CardContent } from '../ui/Card';
-import { Upload, FileCheck, AlertCircle, BarChart4, PieChart, ListFilter } from 'lucide-react';
+import { Upload, FileCheck, AlertCircle, BarChart4, ListFilter, X } from 'lucide-react';
 import Button from '../ui/Button';
 import ClashAnalysis from './ClashAnalysis';
 
@@ -19,6 +19,7 @@ const XmlViewer: React.FC = () => {
   const [fileName, setFileName] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'raw' | 'analytics'>('analytics');
   const [clashStats, setClashStats] = useState<ClashStats | null>(null);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const calculateClashStats = (data: any): ClashStats => {
     const stats: ClashStats = {
@@ -94,6 +95,22 @@ const XmlViewer: React.FC = () => {
     reader.readAsText(file);
   };
 
+  const clearFile = () => {
+    setXmlData(null);
+    setFileName(null);
+    setError(null);
+    setClashStats(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const triggerFileUpload = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
   const renderAnalytics = () => {
     if (!clashStats) return null;
 
@@ -165,9 +182,18 @@ const XmlViewer: React.FC = () => {
             <h2 className="text-xl font-semibold text-slate-900 dark:text-white">XML Model Data</h2>
             <div className="flex items-center gap-4">
               {fileName && (
-                <span className="text-sm text-slate-600 dark:text-slate-400">
-                  {fileName}
-                </span>
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-full">
+                  <span className="text-sm text-slate-600 dark:text-slate-400">
+                    {fileName}
+                  </span>
+                  <button
+                    onClick={clearFile}
+                    className="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition-colors"
+                    aria-label="Remove file"
+                  >
+                    <X size={14} className="text-slate-500 dark:text-slate-400" />
+                  </button>
+                </div>
               )}
               <div className="flex items-center gap-2">
                 <Button
@@ -186,23 +212,22 @@ const XmlViewer: React.FC = () => {
                 >
                   Raw Data
                 </Button>
-                <div className="relative">
-                  <input
-                    type="file"
-                    accept=".xml"
-                    onChange={handleFileUpload}
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                    id="xml-upload"
-                  />
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="pointer-events-none"
-                    leftIcon={<Upload size={16} />}
-                  >
-                    Upload XML
-                  </Button>
-                </div>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".xml"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                  id="xml-upload"
+                />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={triggerFileUpload}
+                  leftIcon={<Upload size={16} />}
+                >
+                  {xmlData ? 'Change File' : 'Upload XML'}
+                </Button>
               </div>
             </div>
           </div>
