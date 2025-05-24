@@ -3,10 +3,53 @@ import Card, { CardHeader, CardContent } from '../ui/Card';
 import { FileEdit, GitMerge, AlertCircle, CheckCircle2, ChevronDown, ChevronUp, Filter, Calendar, Users2, X } from 'lucide-react';
 import Button from '../ui/Button';
 
-// ... (previous interface definitions)
+interface Update {
+  id: string;
+  type: 'edit' | 'merge' | 'alert' | 'success';
+  user: string;
+  action: string;
+  model: string;
+  timestamp: string;
+  discipline: string;
+}
 
 const RecentUpdates: React.FC = () => {
-  // ... (previous state definitions)
+  const currentDate = new Date();
+  const [isExpanded, setIsExpanded] = useState(true);
+  const [showFilters, setShowFilters] = useState(false);
+  const [selectedDisciplines, setSelectedDisciplines] = useState<string[]>([]);
+  const [dateRange, setDateRange] = useState<string>('all');
+
+  // Mock data - replace with actual data from your API/database
+  const [updates] = useState<Update[]>([
+    {
+      id: '1',
+      type: 'edit',
+      user: 'John Doe',
+      action: 'Modified structural beam dimensions',
+      model: 'Building A - Structure',
+      timestamp: new Date().toISOString(),
+      discipline: 'Structural'
+    },
+    // Add more mock updates as needed
+  ]);
+
+  const [filteredUpdates, setFilteredUpdates] = useState<Update[]>(updates);
+
+  const getUpdateIcon = (type: Update['type']) => {
+    switch (type) {
+      case 'edit':
+        return <FileEdit className="h-5 w-5 text-blue-500" />;
+      case 'merge':
+        return <GitMerge className="h-5 w-5 text-green-500" />;
+      case 'alert':
+        return <AlertCircle className="h-5 w-5 text-red-500" />;
+      case 'success':
+        return <CheckCircle2 className="h-5 w-5 text-green-500" />;
+      default:
+        return null;
+    }
+  };
 
   const groupUpdatesByDate = (updates: Update[]) => {
     const groups: { [key: string]: Update[] } = {
@@ -37,8 +80,6 @@ const RecentUpdates: React.FC = () => {
 
     return groups;
   };
-
-  // ... (previous helper functions)
 
   const groupedUpdates = groupUpdatesByDate(filteredUpdates);
 
@@ -103,10 +144,66 @@ const RecentUpdates: React.FC = () => {
 
   return (
     <Card>
-      {/* ... (previous header code) */}
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <div className="flex items-center space-x-2">
+          <h2 className="text-lg font-semibold">Recent Updates</h2>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setShowFilters(!showFilters)}
+            className="ml-2"
+          >
+            <Filter className="h-4 w-4" />
+          </Button>
+        </div>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setIsExpanded(!isExpanded)}
+        >
+          {isExpanded ? (
+            <ChevronUp className="h-4 w-4" />
+          ) : (
+            <ChevronDown className="h-4 w-4" />
+          )}
+        </Button>
+      </CardHeader>
       {isExpanded && (
         <CardContent>
-          {/* ... (previous filter code) */}
+          {showFilters && (
+            <div className="mb-6 space-y-4">
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  variant={dateRange === 'all' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setDateRange('all')}
+                >
+                  All Time
+                </Button>
+                <Button
+                  variant={dateRange === 'today' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setDateRange('today')}
+                >
+                  Today
+                </Button>
+                <Button
+                  variant={dateRange === 'week' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setDateRange('week')}
+                >
+                  This Week
+                </Button>
+                <Button
+                  variant={dateRange === 'month' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setDateRange('month')}
+                >
+                  This Month
+                </Button>
+              </div>
+            </div>
+          )}
 
           <div className="flow-root space-y-8">
             {filteredUpdates.length > 0 ? (
