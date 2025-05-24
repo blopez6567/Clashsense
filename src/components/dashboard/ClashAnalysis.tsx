@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Card, { CardHeader, CardContent } from '../ui/Card';
 import Button from '../ui/Button';
-import { Brain, Loader2, AlertTriangle } from 'lucide-react';
+import { Brain, Loader2, AlertTriangle, RefreshCw } from 'lucide-react';
 
 interface ClashAnalysisProps {
   xmlData: any;
@@ -15,41 +15,81 @@ interface AnalysisResponse {
   message?: string;
 }
 
+const MAX_RETRIES = 3;
+const INITIAL_DELAY = 2000; // 2 seconds
+
 const ClashAnalysis: React.FC<ClashAnalysisProps> = ({ xmlData }) => {
   const [analysis, setAnalysis] = useState<AnalysisResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
+  const [retrying, setRetrying] = useState(false);
+
+  const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+  const makeAnalysisRequest = async (clashData: any): Promise<AnalysisResponse> => {
+    const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/clash-analysis`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+      },
+      body: JSON.stringify({ clashData }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      if (response.status === 429) {
+        throw new Error('API rate limit exceeded');
+      }
+      throw new Error(data.message || 'Failed to analyze clashes');
+    }
+
+    return data;
+  };
 
   const analyzeClashes = async () => {
     setLoading(true);
     setError(null);
     setAnalysis(null);
+    setRetryCount(0);
+    setRetrying(false);
 
     try {
       const clashData = formatClashData(xmlData);
+      let lastError: Error | null = null;
 
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/clash-analysis`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-        },
-        body: JSON.stringify({ clashData }),
-      });
+      for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+        try {
+          if (attempt > 0) {
+            setRetrying(true);
+            const delay = INITIAL_DELAY * Math.pow(2, attempt - 1);
+            await sleep(delay);
+          }
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Failed to analyze clashes');
+          const data = await makeAnalysisRequest(clashData);
+          setAnalysis(data);
+          setRetrying(false);
+          return;
+        } catch (err) {
+          lastError = err as Error;
+          if (err instanceof Error && err.message.includes('rate limit')) {
+            setRetryCount(attempt + 1);
+            continue;
+          }
+          throw err;
+        }
       }
 
-      setAnalysis(data);
+      throw lastError || new Error('Maximum retries exceeded');
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to analyze clashes';
       setError(errorMessage);
       console.error('Analysis error:', err);
     } finally {
       setLoading(false);
+      setRetrying(false);
     }
   };
 
@@ -77,9 +117,21 @@ const ClashAnalysis: React.FC<ClashAnalysisProps> = ({ xmlData }) => {
           <Button
             onClick={analyzeClashes}
             disabled={loading || !xmlData}
-            leftIcon={loading ? <Loader2 className="animate-spin" size={16} /> : <Brain size={16} />}
+            leftIcon={loading ? (
+              retrying ? (
+                <RefreshCw className="animate-spin" size={16} />
+              ) : (
+                <Loader2 className="animate-spin" size={16} />
+              )
+            ) : (
+              <Brain size={16} />
+            )}
           >
-            {loading ? 'Analyzing...' : 'Analyze Clashes'}
+            {loading ? (
+              retrying ? `Retrying (${retryCount}/${MAX_RETRIES})...` : 'Analyzing...'
+            ) : (
+              'Analyze Clashes'
+            )}
           </Button>
         </div>
       </CardHeader>
@@ -90,9 +142,9 @@ const ClashAnalysis: React.FC<ClashAnalysisProps> = ({ xmlData }) => {
             <div>
               <p className="font-medium">Analysis Failed</p>
               <p className="mt-1">{error}</p>
-              {error.includes('rate limit') && (
+              {error.includes('rate limit') && retryCount >= MAX_RETRIES && (
                 <p className="mt-2 text-sm">
-                  Please try again in a few moments.
+                  Maximum retries exceeded. Please try again in a few minutes.
                 </p>
               )}
             </div>
