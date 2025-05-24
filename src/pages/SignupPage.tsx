@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, ArrowLeft, CheckCircle } from 'lucide-react';
 import Logo from '../components/ui/Logo';
 import Button from '../components/ui/Button';
 
 const SignupPage: React.FC = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -13,6 +14,8 @@ const SignupPage: React.FC = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   React.useEffect(() => {
     document.title = 'Sign Up | ClashSense';
@@ -23,9 +26,23 @@ const SignupPage: React.FC = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log(formData);
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      // Here you would typically make an API call to create the user account
+      // For this example, we'll simulate a successful signup
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // After successful signup, redirect to dashboard
+      navigate('/dashboard');
+    } catch (err) {
+      setError('Failed to create account. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const benefits = [
@@ -58,6 +75,12 @@ const SignupPage: React.FC = () => {
 
         <div className="mt-8 mx-auto w-full max-w-md">
           <div className="bg-white/10 backdrop-blur-sm py-8 px-4 shadow-sm sm:rounded-lg sm:px-10 border border-white/20">
+            {error && (
+              <div className="mb-4 p-3 rounded bg-red-500/20 border border-red-500/40 text-white text-sm">
+                {error}
+              </div>
+            )}
+            
             <form className="space-y-6" onSubmit={handleSubmit}>
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                 <div>
@@ -165,10 +188,11 @@ const SignupPage: React.FC = () => {
                 <Button 
                   type="submit" 
                   fullWidth 
-                  disabled={!agreeTerms}
+                  disabled={!agreeTerms || isLoading}
+                  isLoading={isLoading}
                   className="bg-white text-blue-600 hover:bg-blue-50"
                 >
-                  Create account
+                  {isLoading ? 'Creating account...' : 'Create account'}
                 </Button>
               </div>
             </form>
