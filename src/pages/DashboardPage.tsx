@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ModelSummary from '../components/dashboard/ModelSummary';
 import ClashOverview from '../components/dashboard/ClashOverview';
 import CoordinationGoals from '../components/dashboard/CoordinationGoals';
@@ -7,6 +7,7 @@ import XmlViewer from '../components/dashboard/XmlViewer';
 import ClashTodoList from '../components/dashboard/ClashTodoList';
 import ClashProgressTracker from '../components/dashboard/ClashProgressTracker';
 import ClashImageParser from '../components/dashboard/ClashImageParser';
+import DashboardTour from '../components/dashboard/DashboardTour';
 import ProjectSelector, { ProjectData } from '../components/dashboard/ProjectSelector';
 import Button from '../components/ui/Button';
 import { LayoutGrid, Layers } from 'lucide-react';
@@ -14,9 +15,12 @@ import { LayoutGrid, Layers } from 'lucide-react';
 const DashboardPage: React.FC = () => {
   const [currentProject, setCurrentProject] = useState<ProjectData | null>(null);
   const [viewMode, setViewMode] = useState<'simple' | 'advanced'>('advanced');
+  const [isFirstVisit, setIsFirstVisit] = useState(true);
 
-  React.useEffect(() => {
+  useEffect(() => {
     document.title = 'Dashboard | ClashSense';
+    const tourCompleted = localStorage.getItem('dashboardTourCompleted');
+    setIsFirstVisit(!tourCompleted);
   }, []);
 
   const handleProjectChange = (project: ProjectData) => {
@@ -25,10 +29,14 @@ const DashboardPage: React.FC = () => {
 
   return (
     <div className="bg-slate-50 dark:bg-slate-900 min-h-screen pt-24 pb-12">
+      <DashboardTour isFirstVisit={isFirstVisit} />
+      
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center mb-8">
-          <ProjectSelector onProjectChange={handleProjectChange} />
-          <div className="flex items-center gap-2 bg-white dark:bg-slate-800 p-1 rounded-lg border border-slate-200 dark:border-slate-700">
+          <div className="project-selector flex-1">
+            <ProjectSelector onProjectChange={handleProjectChange} />
+          </div>
+          <div className="view-toggle flex items-center gap-2 bg-white dark:bg-slate-800 p-1 rounded-lg border border-slate-200 dark:border-slate-700">
             <Button
               size="sm"
               variant={viewMode === 'simple' ? 'primary' : 'ghost'}
@@ -52,36 +60,51 @@ const DashboardPage: React.FC = () => {
           <div className="grid grid-cols-1 gap-6">
             {viewMode === 'advanced' ? (
               <>
-                <ModelSummary stats={currentProject.modelStats} />
+                <div className="model-summary">
+                  <ModelSummary stats={currentProject.modelStats} />
+                </div>
                 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                  <div className="lg:col-span-2">
+                  <div className="lg:col-span-2 clash-overview">
                     <ClashOverview stats={currentProject.clashStats} />
                   </div>
-                  <div className="lg:col-span-1">
+                  <div className="lg:col-span-1 coordination-goals">
                     <CoordinationGoals project={currentProject} />
                   </div>
                 </div>
                 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                  <div className="lg:col-span-2">
+                  <div className="lg:col-span-2 clash-todo">
                     <ClashTodoList project={currentProject} />
                   </div>
-                  <div className="lg:col-span-1">
+                  <div className="lg:col-span-1 clash-progress">
                     <ClashProgressTracker progress={currentProject.disciplineProgress} />
                   </div>
                 </div>
                 
-                <XmlViewer />
+                <div className="quick-clash-analysis">
+                  <ClashImageParser />
+                </div>
                 
-                <RecentUpdates project={currentProject} />
+                <div className="xml-viewer">
+                  <XmlViewer />
+                </div>
+                
+                <div className="recent-updates">
+                  <RecentUpdates project={currentProject} />
+                </div>
               </>
             ) : (
-              // Simple view with essential features
               <div className="space-y-6">
-                <ClashImageParser />
-                <XmlViewer />
-                <ClashTodoList project={currentProject} />
+                <div className="quick-clash-analysis">
+                  <ClashImageParser />
+                </div>
+                <div className="xml-viewer">
+                  <XmlViewer />
+                </div>
+                <div className="clash-todo">
+                  <ClashTodoList project={currentProject} />
+                </div>
               </div>
             )}
           </div>
