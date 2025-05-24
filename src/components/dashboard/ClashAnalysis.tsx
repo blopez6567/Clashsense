@@ -1,20 +1,29 @@
 import React, { useState } from 'react';
 import Card, { CardHeader, CardContent } from '../ui/Card';
 import Button from '../ui/Button';
-import { Brain, Loader2 } from 'lucide-react';
+import { Brain, Loader2, AlertTriangle } from 'lucide-react';
 
 interface ClashAnalysisProps {
   xmlData: any;
 }
 
+interface AnalysisResponse {
+  analysis: string;
+  analyzedClashes: number;
+  totalClashes: number;
+  error?: string;
+  message?: string;
+}
+
 const ClashAnalysis: React.FC<ClashAnalysisProps> = ({ xmlData }) => {
-  const [analysis, setAnalysis] = useState<string | null>(null);
+  const [analysis, setAnalysis] = useState<AnalysisResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const analyzeClashes = async () => {
     setLoading(true);
     setError(null);
+    setAnalysis(null);
 
     try {
       const clashData = formatClashData(xmlData);
@@ -28,14 +37,19 @@ const ClashAnalysis: React.FC<ClashAnalysisProps> = ({ xmlData }) => {
         body: JSON.stringify({ clashData }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error('Failed to analyze clashes');
+        if (response.status === 429) {
+          throw new Error(data.message || 'Rate limit exceeded. Please try again later.');
+        }
+        throw new Error(data.message || 'Failed to analyze clashes');
       }
 
-      const data = await response.json();
-      setAnalysis(data.analysis);
+      setAnalysis(data);
     } catch (err) {
-      setError('Failed to analyze clashes. Please try again.');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to analyze clashes';
+      setError(errorMessage);
       console.error('Analysis error:', err);
     } finally {
       setLoading(false);
@@ -43,8 +57,6 @@ const ClashAnalysis: React.FC<ClashAnalysisProps> = ({ xmlData }) => {
   };
 
   const formatClashData = (data: any) => {
-    // Extract relevant clash information from XML data
-    // This is a simplified example - adjust based on your XML structure
     const clashes = data.clashdetective?.batchtest?.clashtests?.clashtest || [];
     
     return {
@@ -76,19 +88,35 @@ const ClashAnalysis: React.FC<ClashAnalysisProps> = ({ xmlData }) => {
       </CardHeader>
       <CardContent>
         {error && (
-          <div className="p-4 mb-4 text-red-700 bg-red-100 dark:bg-red-900/30 dark:text-red-300 rounded-lg">
-            {error}
+          <div className="p-4 mb-4 text-red-700 bg-red-100 dark:bg-red-900/30 dark:text-red-300 rounded-lg flex items-start gap-3">
+            <AlertTriangle className="flex-shrink-0 mt-1" size={20} />
+            <div>
+              <p className="font-medium">Analysis Failed</p>
+              <p className="mt-1">{error}</p>
+              {error.includes('quota') && (
+                <p className="mt-2 text-sm">
+                  Please try again later or contact support if this persists.
+                </p>
+              )}
+            </div>
           </div>
         )}
 
         {analysis && (
           <div className="prose dark:prose-invert max-w-none">
             <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-6">
-              <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-4">
-                Analysis Results
-              </h3>
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-medium text-slate-900 dark:text-white m-0">
+                  Analysis Results
+                </h3>
+                {analysis.analyzedClashes < analysis.totalClashes && (
+                  <span className="text-sm text-slate-500 dark:text-slate-400">
+                    Analyzed {analysis.analyzedClashes} of {analysis.totalClashes} clashes
+                  </span>
+                )}
+              </div>
               <div className="whitespace-pre-wrap text-slate-700 dark:text-slate-300">
-                {analysis}
+                {analysis.analysis}
               </div>
             </div>
           </div>
