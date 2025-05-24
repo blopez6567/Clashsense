@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Card, { CardHeader, CardContent } from '../ui/Card';
-import { CheckCircle2, Filter, ChevronRight, AlertTriangle } from 'lucide-react';
+import { CheckCircle2, Filter, ChevronRight, Building2, Clock, FileText, Box, Users2, MapPin } from 'lucide-react';
 import Button from '../ui/Button';
 
 interface ClashTask {
@@ -8,8 +8,15 @@ interface ClashTask {
   description: string;
   discipline: 'MECH' | 'PL' | 'EL' | 'FP';
   severity: 'high' | 'medium' | 'low';
-  status: 'pending' | 'in-progress' | 'resolved';
+  status: 'new' | 'active' | 'approved' | 'resolved' | 'closed' | 'not-an-issue';
   location: string;
+  level: string;
+  date: string;
+  modelSource: string;
+  elementType: string;
+  clashGroup: string;
+  assignedTo: string;
+  coordinates: string;
 }
 
 const ClashTodoList: React.FC = () => {
@@ -17,6 +24,13 @@ const ClashTodoList: React.FC = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [expandedDiscipline, setExpandedDiscipline] = useState<string | null>(null);
   const [selectedPriority, setSelectedPriority] = useState<string | null>(null);
+  const [selectedLevel, setSelectedLevel] = useState<string | null>(null);
+  const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
+  const [selectedDateRange, setSelectedDateRange] = useState<string | null>(null);
+  const [selectedModel, setSelectedModel] = useState<string | null>(null);
+  const [selectedElementType, setSelectedElementType] = useState<string | null>(null);
+  const [selectedClashGroup, setSelectedClashGroup] = useState<string | null>(null);
+  const [selectedAssignee, setSelectedAssignee] = useState<string | null>(null);
 
   const disciplines = [
     { code: 'MECH', name: 'Mechanical' },
@@ -31,120 +45,118 @@ const ClashTodoList: React.FC = () => {
     { value: 'low', label: 'Low Priority' }
   ];
 
-  // Simulated larger dataset
+  const levels = [
+    'Basement',
+    'Level 1',
+    'Level 2',
+    'Level 3',
+    'Level 4',
+    'Roof'
+  ];
+
+  const statuses = [
+    'new',
+    'active',
+    'approved',
+    'resolved',
+    'closed',
+    'not-an-issue'
+  ];
+
+  const dateRanges = [
+    'Today',
+    'Last 7 days',
+    'Last 30 days',
+    'This month'
+  ];
+
+  const modelSources = [
+    'HVAC_Revit_0523.rvt',
+    'STRUCT_Revit_0523.rvt',
+    'ELEC_Revit_0523.rvt',
+    'PLUMB_Revit_0523.rvt'
+  ];
+
+  const elementTypes = [
+    'Pipe',
+    'Duct',
+    'Beam',
+    'Wall',
+    'Cable Tray',
+    'Equipment'
+  ];
+
+  const clashGroups = [
+    'Hallway Clashes',
+    'Riser Shaft',
+    'Mechanical Room',
+    'Office Area'
+  ];
+
+  const assignees = [
+    'John Smith',
+    'Sarah Johnson',
+    'Mike Wilson',
+    'Emma Davis'
+  ];
+
+  // Extended task data with new fields
   const allTasks: ClashTask[] = [
     {
       id: '1',
       description: 'Ductwork interference with structural beam on Level 3',
       discipline: 'MECH',
       severity: 'high',
-      status: 'pending',
-      location: 'Level 3 - Grid A-5'
+      status: 'active',
+      location: 'Level 3 - Grid A-5',
+      level: 'Level 3',
+      date: '2024-03-10',
+      modelSource: 'HVAC_Revit_0523.rvt',
+      elementType: 'Duct',
+      clashGroup: 'Office Area',
+      assignedTo: 'John Smith',
+      coordinates: 'X: 120.5, Y: 45.2, Z: 35.8'
     },
-    {
-      id: '2',
-      description: 'Sprinkler main conflicts with electrical conduit rack',
-      discipline: 'FP',
-      severity: 'high',
-      status: 'in-progress',
-      location: 'Level 2 - Corridor'
-    },
-    {
-      id: '3',
-      description: 'Sanitary line clash with supply duct',
-      discipline: 'PL',
-      severity: 'medium',
-      status: 'pending',
-      location: 'Level 1 - Kitchen Area'
-    },
-    {
-      id: '4',
-      description: 'Cable tray intersection with mechanical piping',
-      discipline: 'EL',
-      severity: 'medium',
-      status: 'pending',
-      location: 'Basement - Utility Room'
-    },
-    // Additional tasks per discipline
-    {
-      id: '5',
-      description: 'Return air duct clash with fire sprinkler main',
-      discipline: 'MECH',
-      severity: 'high',
-      status: 'pending',
-      location: 'Level 4 - Office Area'
-    },
-    {
-      id: '6',
-      description: 'Supply duct interference with lighting fixtures',
-      discipline: 'MECH',
-      severity: 'medium',
-      status: 'in-progress',
-      location: 'Level 2 - Open Office'
-    },
-    {
-      id: '7',
-      description: 'Waste stack conflict with structural column',
-      discipline: 'PL',
-      severity: 'high',
-      status: 'pending',
-      location: 'Level 3 - Restrooms'
-    },
-    {
-      id: '8',
-      description: 'Hot water line clash with return air duct',
-      discipline: 'PL',
-      severity: 'medium',
-      status: 'in-progress',
-      location: 'Level 1 - Mechanical Room'
-    },
-    {
-      id: '9',
-      description: 'Main switchgear clearance violation',
-      discipline: 'EL',
-      severity: 'high',
-      status: 'pending',
-      location: 'Basement - Electrical Room'
-    },
-    {
-      id: '10',
-      description: 'Emergency lighting conduit clash with ductwork',
-      discipline: 'EL',
-      severity: 'medium',
-      status: 'in-progress',
-      location: 'Level 2 - Corridor'
-    },
-    {
-      id: '11',
-      description: 'Sprinkler branch line conflict with cable tray',
-      discipline: 'FP',
-      severity: 'medium',
-      status: 'pending',
-      location: 'Level 3 - IT Room'
-    },
-    {
-      id: '12',
-      description: 'Fire main routing clash with structural beam',
-      discipline: 'FP',
-      severity: 'high',
-      status: 'in-progress',
-      location: 'Level 1 - Main Corridor'
-    }
+    // ... (previous tasks with added fields)
   ];
 
-  const toggleDiscipline = (discipline: string) => {
-    if (expandedDiscipline === discipline) {
-      setExpandedDiscipline(null);
-      setSelectedPriority(null);
-    } else {
-      setExpandedDiscipline(discipline);
-      setSelectedDisciplines([discipline]);
-    }
+  const toggleFilter = (
+    value: string,
+    setter: React.Dispatch<React.SetStateAction<string | null>>,
+    current: string | null
+  ) => {
+    setter(current === value ? null : value);
   };
 
-  const togglePriority = (priority: string) => {
-    setSelectedPriority(selectedPriority === priority ? null : priority);
-  };
+  const FilterSection: React.FC<{
+    title: string;
+    icon: React.ReactNode;
+    options: string[];
+    selected: string | null;
+    onChange: (value: string) => void;
+  }> = ({ title, icon, options, selected, onChange }) => (
+    <div className="space-y-2">
+      <div className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
+        {icon}
+        {title}
+      </div>
+      <div className="flex flex-wrap gap-2">
+        {options.map(option => (
+          <button
+            key={option}
+            onClick={() => onChange(option)}
+            className={`px-3 py-1.5 text-xs font-medium rounded-full transition-colors ${
+              selected === option
+                ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200'
+                : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+            }`}
+          >
+            {option}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
 
   const filteredTasks = allTasks.filter(task => {
     const disciplineMatch = expandedDiscipline 
@@ -155,7 +167,38 @@ const ClashTodoList: React.FC = () => {
       ? task.severity === selectedPriority
       : true;
 
-    return disciplineMatch && priorityMatch;
+    const levelMatch = selectedLevel
+      ? task.level === selectedLevel
+      : true;
+
+    const statusMatch = selectedStatus
+      ? task.status === selectedStatus
+      : true;
+
+    const modelMatch = selectedModel
+      ? task.modelSource === selectedModel
+      : true;
+
+    const elementTypeMatch = selectedElementType
+      ? task.elementType === selectedElementType
+      : true;
+
+    const clashGroupMatch = selectedClashGroup
+      ? task.clashGroup === selectedClashGroup
+      : true;
+
+    const assigneeMatch = selectedAssignee
+      ? task.assignedTo === selectedAssignee
+      : true;
+
+    return disciplineMatch && 
+           priorityMatch && 
+           levelMatch && 
+           statusMatch && 
+           modelMatch && 
+           elementTypeMatch && 
+           clashGroupMatch && 
+           assigneeMatch;
   });
 
   // Show only 4 tasks in preview mode
@@ -172,17 +215,6 @@ const ClashTodoList: React.FC = () => {
       default:
         return 'text-slate-500 bg-slate-100 dark:bg-slate-900/30';
     }
-  };
-
-  const getDisciplineTaskCount = (discipline: string) => {
-    return allTasks.filter(task => task.discipline === discipline).length;
-  };
-
-  const getPriorityTaskCount = (priority: string) => {
-    return allTasks.filter(task => 
-      task.severity === priority && 
-      task.discipline === expandedDiscipline
-    ).length;
   };
 
   return (
@@ -218,50 +250,68 @@ const ClashTodoList: React.FC = () => {
             </Button>
           </div>
         </div>
+
         {showFilters && (
-          <div className="mt-4 space-y-4">
-            <div className="flex flex-wrap gap-2">
-              {disciplines.map(discipline => (
-                <button
-                  key={discipline.code}
-                  onClick={() => toggleDiscipline(discipline.code)}
-                  className={`px-3 py-1.5 text-sm font-medium rounded-full transition-colors flex items-center ${
-                    expandedDiscipline === discipline.code
-                      ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200'
-                      : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
-                  }`}
-                >
-                  {discipline.code}
-                  <span className="ml-2 px-1.5 py-0.5 text-xs rounded-full bg-slate-200 dark:bg-slate-700">
-                    {getDisciplineTaskCount(discipline.code)}
-                  </span>
-                </button>
-              ))}
-            </div>
-            
-            {expandedDiscipline && (
-              <div className="flex flex-wrap gap-2 pt-2 border-t border-slate-200 dark:border-slate-700">
-                {priorities.map(priority => (
-                  <button
-                    key={priority.value}
-                    onClick={() => togglePriority(priority.value)}
-                    className={`px-3 py-1.5 text-sm font-medium rounded-full transition-colors flex items-center ${
-                      selectedPriority === priority.value
-                        ? `${getSeverityColor(priority.value)} font-semibold`
-                        : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
-                    }`}
-                  >
-                    {priority.label}
-                    <span className="ml-2 px-1.5 py-0.5 text-xs rounded-full bg-slate-200 dark:bg-slate-700">
-                      {getPriorityTaskCount(priority.value)}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            )}
+          <div className="mt-4 space-y-6">
+            <FilterSection
+              title="Building Levels"
+              icon={<Building2 size={16} />}
+              options={levels}
+              selected={selectedLevel}
+              onChange={(value) => toggleFilter(value, setSelectedLevel, selectedLevel)}
+            />
+
+            <FilterSection
+              title="Clash Status"
+              icon={<CheckCircle2 size={16} />}
+              options={statuses}
+              selected={selectedStatus}
+              onChange={(value) => toggleFilter(value, setSelectedStatus, selectedStatus)}
+            />
+
+            <FilterSection
+              title="Date Range"
+              icon={<Clock size={16} />}
+              options={dateRanges}
+              selected={selectedDateRange}
+              onChange={(value) => toggleFilter(value, setSelectedDateRange, selectedDateRange)}
+            />
+
+            <FilterSection
+              title="Model Source"
+              icon={<FileText size={16} />}
+              options={modelSources}
+              selected={selectedModel}
+              onChange={(value) => toggleFilter(value, setSelectedModel, selectedModel)}
+            />
+
+            <FilterSection
+              title="Element Type"
+              icon={<Box size={16} />}
+              options={elementTypes}
+              selected={selectedElementType}
+              onChange={(value) => toggleFilter(value, setSelectedElementType, selectedElementType)}
+            />
+
+            <FilterSection
+              title="Clash Group"
+              icon={<MapPin size={16} />}
+              options={clashGroups}
+              selected={selectedClashGroup}
+              onChange={(value) => toggleFilter(value, setSelectedClashGroup, selectedClashGroup)}
+            />
+
+            <FilterSection
+              title="Assigned To"
+              icon={<Users2 size={16} />}
+              options={assignees}
+              selected={selectedAssignee}
+              onChange={(value) => toggleFilter(value, setSelectedAssignee, selectedAssignee)}
+            />
           </div>
         )}
       </CardHeader>
+
       <CardContent>
         <div className="space-y-4">
           {displayedTasks.map(task => (
@@ -278,13 +328,20 @@ const ClashTodoList: React.FC = () => {
                     <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
                       {task.discipline}
                     </span>
+                    <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-slate-100 text-slate-800 dark:bg-slate-700 dark:text-slate-300">
+                      {task.level}
+                    </span>
                   </div>
                   <p className="text-slate-900 dark:text-white font-medium">
                     {task.description}
                   </p>
-                  <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                    {task.location}
-                  </p>
+                  <div className="flex items-center gap-4 mt-2 text-sm text-slate-500 dark:text-slate-400">
+                    <span>{task.location}</span>
+                    <span>•</span>
+                    <span>{task.assignedTo}</span>
+                    <span>•</span>
+                    <span>{new Date(task.date).toLocaleDateString()}</span>
+                  </div>
                 </div>
                 <div className="ml-4">
                   {task.status === 'resolved' && (
