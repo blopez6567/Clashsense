@@ -45,10 +45,7 @@ const SignupPage: React.FC = () => {
       
       <div className="flex-1 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="mx-auto w-full max-w-md">
-          <div className="flex justify-center">
-            <Logo />
-          </div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-slate-900 dark:text-white">
+          <h2 className="text-center text-3xl font-extrabold text-slate-900 dark:text-white">
             Create your account
           </h2>
           <p className="mt-2 text-center text-sm text-slate-600 dark:text-slate-400">
@@ -178,11 +175,9 @@ const SignupPage: React.FC = () => {
         <div className="absolute inset-0 h-full w-full bg-gradient-to-r from-blue-600 to-blue-700">
           <div className="absolute inset-0 bg-slate-900 opacity-20"></div>
           <div className="flex flex-col justify-center h-full max-w-lg mx-auto px-8 text-white">
-            <img 
-              src="/home/project/Clash Sense Logo PNG.png"
-              alt="Clashsense Logo"
-              className="w-64 h-auto mb-12"
-            />
+            <div className="flex justify-center mb-12">
+              <Logo size={80} showText={false} />
+            </div>
             <h2 className="text-3xl font-bold mb-8">Join Clashsense Today</h2>
             <div className="space-y-4">
               {benefits.map((benefit, index) => (
