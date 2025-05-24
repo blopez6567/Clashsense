@@ -4,18 +4,20 @@ import Card, { CardHeader, CardContent } from '../ui/Card';
 import { Upload, ChevronDown, ChevronUp, Loader2 } from 'lucide-react';
 import Button from '../ui/Button';
 
+type Provider = 'openai' | 'google';
+
 const ClashImageParser: React.FC = () => {
   const [isExpanded, setIsExpanded] = useState(true);
   const [analysis, setAnalysis] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [selectedProvider, setSelectedProvider] = useState<Provider>('openai');
 
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
     if (!file) return;
 
-    // Create preview URL
     setPreviewUrl(URL.createObjectURL(file));
     setIsLoading(true);
     setAnalysis(null);
@@ -24,6 +26,7 @@ const ClashImageParser: React.FC = () => {
     try {
       const formData = new FormData();
       formData.append('image', file);
+      formData.append('provider', selectedProvider);
 
       const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/analyze-clash-image`, {
         method: 'POST',
@@ -46,7 +49,7 @@ const ClashImageParser: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [selectedProvider]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -66,6 +69,26 @@ const ClashImageParser: React.FC = () => {
       </CardHeader>
       {isExpanded && (
         <CardContent>
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+              Analysis Provider
+            </label>
+            <div className="flex space-x-4">
+              <Button
+                variant={selectedProvider === 'openai' ? 'primary' : 'outline'}
+                onClick={() => setSelectedProvider('openai')}
+              >
+                OpenAI Vision
+              </Button>
+              <Button
+                variant={selectedProvider === 'google' ? 'primary' : 'outline'}
+                onClick={() => setSelectedProvider('google')}
+              >
+                Google Vision AI
+              </Button>
+            </div>
+          </div>
+
           <div
             {...getRootProps()}
             className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
@@ -102,7 +125,7 @@ const ClashImageParser: React.FC = () => {
             <div className="mt-6 text-center">
               <Loader2 className="h-8 w-8 animate-spin text-blue-500 mx-auto" />
               <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
-                Analyzing clash image...
+                Analyzing clash image with {selectedProvider === 'openai' ? 'OpenAI' : 'Google Vision'}...
               </p>
             </div>
           )}
