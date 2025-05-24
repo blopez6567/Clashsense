@@ -151,13 +151,13 @@ const SignupPage: React.FC = () => {
                 />
                 <label htmlFor="agree-terms" className="ml-2 block text-sm text-white">
                   I agree to the{' '}
-                  <a href="#" className="font-medium text-white hover:text-blue-200">
+                  <Link to="/terms" className="font-medium text-blue-300 hover:text-blue-200">
                     Terms of Service
-                  </a>{' '}
+                  </Link>{' '}
                   and{' '}
-                  <a href="#" className="font-medium text-white hover:text-blue-200">
+                  <Link to="/terms" className="font-medium text-blue-300 hover:text-blue-200">
                     Privacy Policy
-                  </a>
+                  </Link>
                 </label>
               </div>
 

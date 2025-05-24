@@ -8,6 +8,7 @@ import ResourcesPage from './pages/ResourcesPage';
 import SolutionsPage from './pages/SolutionsPage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
+import TermsPage from './pages/TermsPage';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
           <Route path="/integrations" element={<IntegrationsPage />} />
           <Route path="/resources" element={<ResourcesPage />} />
           <Route path="/solutions" element={<SolutionsPage />} />
+          <Route path="/terms" element={<TermsPage />} />
         </Route>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
