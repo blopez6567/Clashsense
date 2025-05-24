@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Users2, Calendar, Clock, ArrowLeft } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Users2, Calendar, Clock, ArrowLeft, Building2 } from 'lucide-react';
 import { ProjectData } from '../../types';
 import Button from '../ui/Button';
 
@@ -9,6 +9,17 @@ interface ProjectSelectorProps {
 
 const ProjectSelector: React.FC<ProjectSelectorProps> = ({ onProjectChange }) => {
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
+  const [showStickyHeader, setShowStickyHeader] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY;
+      setShowStickyHeader(scrollPosition > 200); // Show after scrolling 200px
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const projects: ProjectData[] = [
     {
@@ -200,22 +211,65 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({ onProjectChange }) =>
   const selectedProject = projects.find(p => p.id === selectedProjectId);
 
   return (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Projects</h2>
-        {selectedProjectId && (
-          <Button
-            variant="outline"
-            size="sm"
-            leftIcon={<ArrowLeft size={16} />}
-            onClick={handleBack}
-          >
-            View All Projects
-          </Button>
-        )}
-      </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-h-[calc(100vh-200px)] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-600 scrollbar-track-transparent">
+    <>
+      {/* Sticky Project Header */}
+      {selectedProject && showStickyHeader && (
+        <div className="fixed top-16 left-0 right-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm z-40 border-b border-slate-200 dark:border-slate-700 shadow-sm transition-all duration-300">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div className="w-10 h-10 rounded-lg overflow-hidden">
+                  <img 
+                    src={selectedProject.image} 
+                    alt={selectedProject.name}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium text-slate-900 dark:text-white">{selectedProject.name}</h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">{selectedProject.client}</p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2 text-sm text-slate-600 dark:text-slate-400">
+                  <Users2 className="h-4 w-4" />
+                  <span>{selectedProject.teamSize}</span>
+                </div>
+                <div className="flex items-center space-x-2 text-sm text-slate-600 dark:text-slate-400">
+                  <Building2 className="h-4 w-4" />
+                  <span>{selectedProject.phase}</span>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  leftIcon={<ArrowLeft size={16} />}
+                  onClick={handleBack}
+                >
+                  Change Project
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Main Project Selector Content */}
+      <div className="space-y-4">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Projects</h2>
+          {selectedProjectId && (
+            <Button
+              variant="outline"
+              size="sm"
+              leftIcon={<ArrowLeft size={16} />}
+              onClick={handleBack}
+            >
+              View All Projects
+            </Button>
+          )}
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-h-[calc(100vh-200px)] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-600 scrollbar-track-transparent">
         {selectedProjectId ? (
           // Show only the selected project
           selectedProject && (
@@ -326,7 +380,8 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({ onProjectChange }) =>
           ))
         )}
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 
