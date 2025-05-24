@@ -17,6 +17,7 @@ interface AnalysisResponse {
 
 const MAX_RETRIES = 3;
 const INITIAL_DELAY = 2000; // 2 seconds
+const BATCH_SIZE = 3; // Process 3 clashes at a time
 
 const ClashAnalysis: React.FC<ClashAnalysisProps> = ({ xmlData }) => {
   const [analysis, setAnalysis] = useState<AnalysisResponse | null>(null);
@@ -24,17 +25,18 @@ const ClashAnalysis: React.FC<ClashAnalysisProps> = ({ xmlData }) => {
   const [error, setError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
   const [retrying, setRetrying] = useState(false);
+  const [progress, setProgress] = useState({ current: 0, total: 0 });
 
   const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-  const makeAnalysisRequest = async (clashData: any): Promise<AnalysisResponse> => {
+  const makeAnalysisRequest = async (clashBatch: any[]): Promise<AnalysisResponse> => {
     const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/clash-analysis`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
       },
-      body: JSON.stringify({ clashData }),
+      body: JSON.stringify({ clashData: clashBatch }),
     });
 
     const data = await response.json();
@@ -49,6 +51,34 @@ const ClashAnalysis: React.FC<ClashAnalysisProps> = ({ xmlData }) => {
     return data;
   };
 
+  const processBatch = async (clashes: any[], startIndex: number): Promise<AnalysisResponse> => {
+    const batch = clashes.slice(startIndex, startIndex + BATCH_SIZE);
+    let lastError: Error | null = null;
+
+    for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        if (attempt > 0) {
+          setRetrying(true);
+          const delay = INITIAL_DELAY * Math.pow(2, attempt - 1);
+          await sleep(delay);
+        }
+
+        const result = await makeAnalysisRequest(batch);
+        setRetrying(false);
+        return result;
+      } catch (err) {
+        lastError = err as Error;
+        if (err instanceof Error && err.message.includes('rate limit')) {
+          setRetryCount(attempt + 1);
+          continue;
+        }
+        throw err;
+      }
+    }
+
+    throw lastError || new Error('Maximum retries exceeded');
+  };
+
   const analyzeClashes = async () => {
     setLoading(true);
     setError(null);
@@ -57,32 +87,40 @@ const ClashAnalysis: React.FC<ClashAnalysisProps> = ({ xmlData }) => {
     setRetrying(false);
 
     try {
-      const clashData = formatClashData(xmlData);
-      let lastError: Error | null = null;
+      const formattedData = formatClashData(xmlData);
+      const clashes = formattedData.clashes;
+      setProgress({ current: 0, total: clashes.length });
 
-      for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+      let combinedAnalysis = '';
+      let totalAnalyzed = 0;
+
+      for (let i = 0; i < clashes.length; i += BATCH_SIZE) {
         try {
-          if (attempt > 0) {
-            setRetrying(true);
-            const delay = INITIAL_DELAY * Math.pow(2, attempt - 1);
-            await sleep(delay);
+          const batchResult = await processBatch(clashes, i);
+          combinedAnalysis += (combinedAnalysis ? '\n\n' : '') + batchResult.analysis;
+          totalAnalyzed += batchResult.analyzedClashes;
+          setProgress({ current: totalAnalyzed, total: clashes.length });
+          
+          // Small delay between batches to avoid rate limits
+          if (i + BATCH_SIZE < clashes.length) {
+            await sleep(1000);
           }
-
-          const data = await makeAnalysisRequest(clashData);
-          setAnalysis(data);
-          setRetrying(false);
-          return;
         } catch (err) {
-          lastError = err as Error;
           if (err instanceof Error && err.message.includes('rate limit')) {
-            setRetryCount(attempt + 1);
-            continue;
+            throw new Error(
+              'Rate limit exceeded. Please try again in a few minutes. ' +
+              `Progress saved: ${totalAnalyzed}/${clashes.length} clashes analyzed.`
+            );
           }
           throw err;
         }
       }
 
-      throw lastError || new Error('Maximum retries exceeded');
+      setAnalysis({
+        analysis: combinedAnalysis,
+        analyzedClashes: totalAnalyzed,
+        totalClashes: clashes.length
+      });
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to analyze clashes';
       setError(errorMessage);
@@ -142,12 +180,27 @@ const ClashAnalysis: React.FC<ClashAnalysisProps> = ({ xmlData }) => {
             <div>
               <p className="font-medium">Analysis Failed</p>
               <p className="mt-1">{error}</p>
-              {error.includes('rate limit') && retryCount >= MAX_RETRIES && (
+              {error.includes('rate limit') && (
                 <p className="mt-2 text-sm">
-                  Maximum retries exceeded. Please try again in a few minutes.
+                  The analysis is being rate limited. This usually happens when processing many clashes at once.
+                  Try again in a few minutes or consider uploading a smaller XML file.
                 </p>
               )}
             </div>
+          </div>
+        )}
+
+        {loading && progress.total > 0 && (
+          <div className="mb-4">
+            <div className="h-2 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-blue-500 transition-all duration-300"
+                style={{ width: `${(progress.current / progress.total) * 100}%` }}
+              />
+            </div>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">
+              Analyzing clashes: {progress.current} of {progress.total}
+            </p>
           </div>
         )}
 
