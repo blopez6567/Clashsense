@@ -4,7 +4,7 @@ import Button from '../components/ui/Button';
 
 const ProductPage: React.FC = () => {
   React.useEffect(() => {
-    document.title = 'Product | Clashsense';
+    document.title = 'Product | ClashSense';
   }, []);
 
   return (
@@ -22,11 +22,11 @@ const ProductPage: React.FC = () => {
         
         <div className="relative max-w-7xl mx-auto py-24 px-4 sm:py-32 sm:px-6 lg:px-8">
           <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">
-            AI-Powered Clash Detection
+            AI-Powered Clash Resolution
             <span className="block text-blue-500 mt-2">for Modern Construction</span>
           </h1>
           <p className="mt-6 text-xl text-slate-300 max-w-3xl">
-            Advanced clash detection and resolution powered by artificial intelligence. 
+            Advanced clash resolution and coordination powered by artificial intelligence. 
             Streamline your BIM coordination workflow and reduce construction delays.
           </p>
           <div className="mt-10 flex space-x-4">
@@ -48,7 +48,7 @@ const ProductPage: React.FC = () => {
               Intelligent Clash Resolution
             </h2>
             <p className="mt-4 text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-              Our AI-powered system automatically detects, analyzes, and suggests solutions for construction clashes.
+              Our AI-powered system automatically detects, analyzes, and resolves construction clashes.
             </p>
           </div>
 
@@ -66,12 +66,12 @@ const ProductPage: React.FC = () => {
                     AI-Driven Analysis
                   </h3>
                   <p className="mt-4 text-slate-600 dark:text-slate-400">
-                    Machine learning algorithms analyze your BIM models in real-time, identifying potential clashes before they become costly issues on-site.
+                    Machine learning algorithms analyze your BIM models in real-time, identifying and resolving potential clashes before they become costly issues on-site.
                   </p>
                   <ul className="mt-6 space-y-3 text-sm text-slate-600 dark:text-slate-400">
                     <li className="flex items-center">
                       <span className="h-1.5 w-1.5 rounded-full bg-blue-500 mr-2"></span>
-                      Automated clash detection
+                      Automated clash resolution
                     </li>
                     <li className="flex items-center">
                       <span className="h-1.5 w-1.5 rounded-full bg-blue-500 mr-2"></span>
@@ -126,7 +126,7 @@ const ProductPage: React.FC = () => {
           <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
             <div className="text-center">
               <div className="text-4xl font-extrabold text-white">98%</div>
-              <div className="mt-2 text-sm text-blue-100">Clash Detection Accuracy</div>
+              <div className="mt-2 text-sm text-blue-100">Resolution Accuracy</div>
             </div>
             <div className="text-center">
               <div className="text-4xl font-extrabold text-white">75%</div>
