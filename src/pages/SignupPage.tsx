@@ -180,9 +180,9 @@ const SignupPage: React.FC = () => {
         <div className="flex flex-col items-center justify-center h-full max-w-lg mx-auto px-8">
           <div className="mb-12">
             <img 
-              src="/images/Clash Sense Logo No Text PNG.png"
+              src="/images/Clash Sense Logo No Text PNG No Background.png"
               alt="Clashsense Logo"
-              className="w-[400px] h-auto"
+              className="w-[1000px] h-auto"
             />
           </div>
           <h2 className="text-3xl font-bold mb-8 text-slate-900 dark:text-white text-center">
