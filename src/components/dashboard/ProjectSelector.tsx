@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Users2, Calendar, Clock } from 'lucide-react';
 import { ProjectData } from '../../types';
 
@@ -7,6 +7,8 @@ interface ProjectSelectorProps {
 }
 
 const ProjectSelector: React.FC<ProjectSelectorProps> = ({ onProjectChange }) => {
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
+
   const projects: ProjectData[] = [
     {
       id: '1',
@@ -97,6 +99,11 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({ onProjectChange }) =>
     }
   ];
 
+  const handleProjectSelect = (project: ProjectData) => {
+    setSelectedProjectId(project.id);
+    onProjectChange(project);
+  };
+
   return (
     <div className="space-y-4">
       <h2 className="text-xl font-semibold text-slate-900 dark:text-white mb-6">Projects</h2>
@@ -104,8 +111,12 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({ onProjectChange }) =>
         {projects.map((project) => (
           <button
             key={project.id}
-            onClick={() => onProjectChange(project)}
-            className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden hover:shadow-md transition-all duration-200 text-left"
+            onClick={() => handleProjectSelect(project)}
+            className={`bg-white dark:bg-slate-800 rounded-lg shadow-sm border-2 overflow-hidden hover:shadow-md transition-all duration-200 text-left ${
+              selectedProjectId === project.id
+                ? 'border-blue-500 dark:border-blue-400 shadow-md ring-2 ring-blue-500/20'
+                : 'border-slate-200 dark:border-slate-700'
+            }`}
           >
             <div className="relative h-48 w-full">
               <img 
@@ -138,7 +149,11 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({ onProjectChange }) =>
                   </div>
                   <div className="h-2 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-blue-500 rounded-full"
+                      className={`h-full rounded-full ${
+                        selectedProjectId === project.id
+                          ? 'bg-blue-500'
+                          : 'bg-blue-400'
+                      }`}
                       style={{ width: `${project.progress}%` }}
                     />
                   </div>
