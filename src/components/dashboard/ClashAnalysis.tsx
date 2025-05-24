@@ -40,9 +40,6 @@ const ClashAnalysis: React.FC<ClashAnalysisProps> = ({ xmlData }) => {
       const data = await response.json();
 
       if (!response.ok) {
-        if (response.status === 429) {
-          throw new Error(data.message || 'Rate limit exceeded. Please try again later.');
-        }
         throw new Error(data.message || 'Failed to analyze clashes');
       }
 
@@ -93,9 +90,9 @@ const ClashAnalysis: React.FC<ClashAnalysisProps> = ({ xmlData }) => {
             <div>
               <p className="font-medium">Analysis Failed</p>
               <p className="mt-1">{error}</p>
-              {error.includes('quota') && (
+              {error.includes('rate limit') && (
                 <p className="mt-2 text-sm">
-                  Please try again later or contact support if this persists.
+                  Please try again in a few moments.
                 </p>
               )}
             </div>
