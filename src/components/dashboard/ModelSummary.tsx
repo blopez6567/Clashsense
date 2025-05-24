@@ -1,5 +1,5 @@
-import React from 'react';
-import { Building2, Users2, FileCheck2, AlertTriangle } from 'lucide-react';
+import React, { useState } from 'react';
+import { Building2, Users2, FileCheck2, AlertTriangle, ChevronDown, ChevronUp } from 'lucide-react';
 import Card, { CardHeader, CardContent } from '../ui/Card';
 
 interface ModelStats {
@@ -13,6 +13,8 @@ interface ModelSummaryProps {
 }
 
 const ModelSummary: React.FC<ModelSummaryProps> = ({ stats }) => {
+  const [isExpanded, setIsExpanded] = useState(true);
+
   const summaryStats = [
     {
       name: 'Total Models',
@@ -42,27 +44,32 @@ const ModelSummary: React.FC<ModelSummaryProps> = ({ stats }) => {
 
   return (
     <Card>
-      <CardHeader>
-        <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Model Summary</h2>
+      <CardHeader className="cursor-pointer" onClick={() => setIsExpanded(!isExpanded)}>
+        <div className="flex justify-between items-center">
+          <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Model Summary</h2>
+          {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+        </div>
       </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {summaryStats.map((stat) => (
-            <div key={stat.name} className="bg-white dark:bg-slate-800 p-6 rounded-lg border border-slate-200 dark:border-slate-700">
-              <div className="flex items-center">
-                <div className="p-2 rounded-lg bg-blue-50 dark:bg-blue-900/20">
-                  {stat.icon}
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{stat.name}</p>
-                  <p className="text-2xl font-semibold text-slate-900 dark:text-white">{stat.value}</p>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">{stat.change}</p>
+      {isExpanded && (
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {summaryStats.map((stat) => (
+              <div key={stat.name} className="bg-white dark:bg-slate-800 p-6 rounded-lg border border-slate-200 dark:border-slate-700">
+                <div className="flex items-center">
+                  <div className="p-2 rounded-lg bg-blue-50 dark:bg-blue-900/20">
+                    {stat.icon}
+                  </div>
+                  <div className="ml-4">
+                    <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{stat.name}</p>
+                    <p className="text-2xl font-semibold text-slate-900 dark:text-white">{stat.value}</p>
+                    <p className="text-sm text-slate-500 dark:text-slate-400">{stat.change}</p>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
-      </CardContent>
+            ))}
+          </div>
+        </CardContent>
+      )}
     </Card>
   );
 };
