@@ -32,10 +32,8 @@ const DashboardPage: React.FC = () => {
       <DashboardTour isFirstVisit={isFirstVisit} />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center mb-8">
-          <div className="project-selector flex-1">
-            <ProjectSelector onProjectChange={handleProjectChange} />
-          </div>
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Dashboard</h2>
           <div className="view-toggle flex items-center gap-2 bg-white dark:bg-slate-800 p-1 rounded-lg border border-slate-200 dark:border-slate-700">
             <Button
               size="sm"
@@ -54,6 +52,10 @@ const DashboardPage: React.FC = () => {
               Advanced
             </Button>
           </div>
+        </div>
+
+        <div className="project-selector mb-8">
+          <ProjectSelector onProjectChange={handleProjectChange} />
         </div>
 
         {currentProject && (
