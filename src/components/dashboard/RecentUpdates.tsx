@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Card, { CardHeader, CardContent } from '../ui/Card';
-import { FileEdit, GitMerge, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { FileEdit, GitMerge, AlertCircle, CheckCircle2, ChevronDown, ChevronUp } from 'lucide-react';
 
 const RecentUpdates: React.FC = () => {
+  const [isExpanded, setIsExpanded] = useState(true);
+
   const updates = [
     {
       id: 1,
@@ -44,57 +46,64 @@ const RecentUpdates: React.FC = () => {
 
   return (
     <Card>
-      <CardHeader className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Recent Model Updates</h2>
-        <button className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium">
-          View all
-        </button>
+      <CardHeader className="flex justify-between items-center cursor-pointer" onClick={() => setIsExpanded(!isExpanded)}>
+        <div className="flex justify-between items-center w-full">
+          <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Recent Model Updates</h2>
+          <div className="flex items-center">
+            <button className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium mr-4">
+              View all
+            </button>
+            {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+          </div>
+        </div>
       </CardHeader>
-      <CardContent>
-        <div className="flow-root">
-          <ul role="list" className="-mb-8">
-            {updates.map((update, updateIdx) => (
-              <li key={update.id}>
-                <div className="relative pb-8">
-                  {updateIdx !== updates.length - 1 ? (
-                    <span
-                      className="absolute top-5 left-5 -ml-px h-full w-0.5 bg-slate-200 dark:bg-slate-700"
-                      aria-hidden="true"
-                    />
-                  ) : null}
-                  <div className="relative flex items-start space-x-3">
-                    <div className="relative">
-                      <div className="h-10 w-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center ring-8 ring-white dark:ring-slate-900">
-                        {update.icon}
-                      </div>
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <div>
-                        <div className="text-sm">
-                          <span className="font-medium text-slate-900 dark:text-white">
-                            {update.user}
-                          </span>
+      {isExpanded && (
+        <CardContent>
+          <div className="flow-root">
+            <ul role="list" className="-mb-8">
+              {updates.map((update, updateIdx) => (
+                <li key={update.id}>
+                  <div className="relative pb-8">
+                    {updateIdx !== updates.length - 1 ? (
+                      <span
+                        className="absolute top-5 left-5 -ml-px h-full w-0.5 bg-slate-200 dark:bg-slate-700"
+                        aria-hidden="true"
+                      />
+                    ) : null}
+                    <div className="relative flex items-start space-x-3">
+                      <div className="relative">
+                        <div className="h-10 w-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center ring-8 ring-white dark:ring-slate-900">
+                          {update.icon}
                         </div>
-                        <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">
-                          {update.action}
-                        </p>
                       </div>
-                      <div className="mt-2 flex items-center space-x-4">
-                        <div className="text-xs text-slate-500 dark:text-slate-400">
-                          <span>{update.model}</span>
+                      <div className="min-w-0 flex-1">
+                        <div>
+                          <div className="text-sm">
+                            <span className="font-medium text-slate-900 dark:text-white">
+                              {update.user}
+                            </span>
+                          </div>
+                          <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">
+                            {update.action}
+                          </p>
                         </div>
-                        <div className="text-xs text-slate-500 dark:text-slate-400">
-                          {update.timestamp}
+                        <div className="mt-2 flex items-center space-x-4">
+                          <div className="text-xs text-slate-500 dark:text-slate-400">
+                            <span>{update.model}</span>
+                          </div>
+                          <div className="text-xs text-slate-500 dark:text-slate-400">
+                            {update.timestamp}
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </CardContent>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </CardContent>
+      )}
     </Card>
   );
 };
