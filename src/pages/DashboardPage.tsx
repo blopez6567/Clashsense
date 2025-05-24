@@ -4,11 +4,12 @@ import ClashOverview from '../components/dashboard/ClashOverview';
 import CoordinationGoals from '../components/dashboard/CoordinationGoals';
 import RecentUpdates from '../components/dashboard/RecentUpdates';
 import XmlViewer from '../components/dashboard/XmlViewer';
+import ClashTodoList from '../components/dashboard/ClashTodoList';
 
 const DashboardPage: React.FC = () => {
   // Update document title when component mounts
   React.useEffect(() => {
-    document.title = 'Dashboard | Clashsense';
+    document.title = 'Dashboard | ClashSense';
   }, []);
 
   return (
@@ -37,6 +38,8 @@ const DashboardPage: React.FC = () => {
               <CoordinationGoals />
             </div>
           </div>
+          
+          <ClashTodoList />
           
           <XmlViewer />
           
