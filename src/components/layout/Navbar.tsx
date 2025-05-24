@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, Moon, Sun } from 'lucide-react';
 import Logo from '../ui/Logo';
 
@@ -8,6 +8,7 @@ const Navbar: React.FC = () => {
   const [isDark, setIsDark] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -24,6 +25,18 @@ const Navbar: React.FC = () => {
   const toggleTheme = () => {
     setIsDark(!isDark);
     document.documentElement.classList.toggle('dark');
+  };
+
+  const handleNavigation = (path: string) => {
+    if (location.pathname === path) {
+      // If clicking the current path, force a navigation to reset the page
+      navigate('/', { replace: true }); // Navigate to home first
+      setTimeout(() => {
+        navigate(path); // Then navigate back to the clicked path
+      }, 0);
+    } else {
+      navigate(path);
+    }
   };
 
   const navLinks = [
@@ -57,9 +70,9 @@ const Navbar: React.FC = () => {
           <div className="hidden md:block">
             <div className="ml-10 flex items-center space-x-4">
               {navLinks.map((link) => (
-                <Link
+                <button
                   key={link.path}
-                  to={link.path}
+                  onClick={() => handleNavigation(link.path)}
                   className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                     location.pathname === link.path
                       ? 'text-blue-500'
@@ -67,7 +80,7 @@ const Navbar: React.FC = () => {
                   }`}
                 >
                   {link.name}
-                </Link>
+                </button>
               ))}
             </div>
           </div>
@@ -80,18 +93,18 @@ const Navbar: React.FC = () => {
             >
               {isDark ? <Sun size={20} /> : <Moon size={20} />}
             </button>
-            <Link
-              to="/login"
+            <button
+              onClick={() => handleNavigation('/login')}
               className="px-4 py-2 text-sm font-medium text-white/90 hover:text-white transition-colors"
             >
               Log in
-            </Link>
-            <Link
-              to="/signup"
+            </button>
+            <button
+              onClick={() => handleNavigation('/signup')}
               className="px-4 py-2 text-sm font-medium rounded-md bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 transition-all shadow-sm hover:shadow"
             >
               Sign up
-            </Link>
+            </button>
           </div>
           
           <div className="md:hidden flex items-center">
@@ -117,31 +130,31 @@ const Navbar: React.FC = () => {
       <div className={`md:hidden ${isOpen ? 'block' : 'hidden'}`}>
         <div className="px-2 pt-2 pb-3 space-y-1 bg-slate-900 shadow-lg">
           {navLinks.map((link) => (
-            <Link
+            <button
               key={link.path}
-              to={link.path}
-              className={`block px-3 py-2 rounded-md text-base font-medium ${
+              onClick={() => handleNavigation(link.path)}
+              className={`block w-full px-3 py-2 rounded-md text-base font-medium text-left ${
                 location.pathname === link.path
                   ? 'text-blue-500 bg-slate-800'
                   : 'text-white/90 hover:text-white hover:bg-slate-800'
               }`}
             >
               {link.name}
-            </Link>
+            </button>
           ))}
           <div className="pt-4 pb-3 border-t border-slate-700">
-            <Link
-              to="/login"
+            <button
+              onClick={() => handleNavigation('/login')}
               className="block w-full px-4 py-2 text-center text-base font-medium text-white/90 hover:text-white transition-colors"
             >
               Log in
-            </Link>
-            <Link
-              to="/signup"
+            </button>
+            <button
+              onClick={() => handleNavigation('/signup')}
               className="block w-full mt-2 px-4 py-2 text-center text-base font-medium rounded-md bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 transition-all shadow-sm hover:shadow"
             >
               Sign up
-            </Link>
+            </button>
           </div>
         </div>
       </div>
