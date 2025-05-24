@@ -179,8 +179,8 @@ const SignupPage: React.FC = () => {
           <div className="absolute inset-0 bg-slate-900 opacity-20"></div>
           <div className="flex flex-col justify-center h-full max-w-lg mx-auto px-8 text-white">
             <img 
-              src="https://raw.githubusercontent.com/stackblitz/stackblitz-images/main/clashsense-logo.png" 
-              alt="Clashsense Logo" 
+              src="/home/project/Clash Sense Logo PNG.png"
+              alt="Clashsense Logo"
               className="w-64 h-auto mb-12"
             />
             <h2 className="text-3xl font-bold mb-8">Join Clashsense Today</h2>
