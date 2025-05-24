@@ -20,8 +20,11 @@ const RecentUpdates: React.FC = () => {
   const [selectedDateRange, setSelectedDateRange] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
 
+  // Example date: March 15, 2024
+  const currentDate = new Date('2024-03-15T00:00:00');
+
   const updates: Update[] = [
-    // Today's updates
+    // Today (March 15, 2024)
     {
       id: 1,
       type: 'modification',
@@ -40,7 +43,7 @@ const RecentUpdates: React.FC = () => {
       timestamp: '2024-03-15T12:15:00',
       discipline: 'STRUCT'
     },
-    // Last Week
+    // Yesterday (March 14, 2024)
     {
       id: 3,
       type: 'issue',
@@ -59,7 +62,7 @@ const RecentUpdates: React.FC = () => {
       timestamp: '2024-03-14T09:20:00',
       discipline: 'PLUMB'
     },
-    // Last 2 Weeks
+    // Last Week (March 8-14, 2024)
     {
       id: 5,
       type: 'modification',
@@ -78,7 +81,7 @@ const RecentUpdates: React.FC = () => {
       timestamp: '2024-03-07T11:45:00',
       discipline: 'MECH'
     },
-    // Last Month
+    // Last Month (February 15 - March 15, 2024)
     {
       id: 7,
       type: 'modification',
@@ -148,11 +151,12 @@ const RecentUpdates: React.FC = () => {
 
   const isWithinDateRange = (timestamp: string, days: number) => {
     if (!days) return true;
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diffTime = Math.abs(now.getTime() - date.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays <= days;
+    
+    const updateDate = new Date(timestamp);
+    const timeDiff = currentDate.getTime() - updateDate.getTime();
+    const daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+    
+    return daysDiff < days;
   };
 
   const filteredUpdates = updates.filter(update => {
@@ -182,6 +186,26 @@ const RecentUpdates: React.FC = () => {
         ? prev.filter(d => d !== code)
         : [...prev, code]
     );
+  };
+
+  const formatDate = (timestamp: string) => {
+    const date = new Date(timestamp);
+    const today = currentDate;
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    if (date.toDateString() === today.toDateString()) {
+      return `Today at ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+    } else if (date.toDateString() === yesterday.toDateString()) {
+      return `Yesterday at ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+    } else {
+      return date.toLocaleString([], {
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
   };
 
   return (
@@ -315,7 +339,7 @@ const RecentUpdates: React.FC = () => {
                               <span>{update.model}</span>
                             </div>
                             <div className="text-xs text-slate-500 dark:text-slate-400">
-                              {new Date(update.timestamp).toLocaleString()}
+                              {formatDate(update.timestamp)}
                             </div>
                             <div className="text-xs font-medium px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200">
                               {update.discipline}
