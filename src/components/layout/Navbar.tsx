@@ -49,7 +49,7 @@ const Navbar: React.FC = () => {
             <Link to="/" className="flex items-center">
               <Logo size={64} logoPath="/images/Clash Sense Logo No Text PNG No Background.png" />
               <span className="ml-2 text-xl font-semibold text-white">
-                Clash<span className="text-blue-500">sense</span>
+                Clash<span className="text-blue-500">Sense</span>
               </span>
             </Link>
           </div>
