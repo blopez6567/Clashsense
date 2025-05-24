@@ -2,25 +2,37 @@ import React from 'react';
 import Card, { CardHeader, CardContent } from '../ui/Card';
 import { CheckCircle2, Clock } from 'lucide-react';
 
-const CoordinationGoals: React.FC = () => {
+interface ProjectData {
+  id: string;
+  name: string;
+  phase: string;
+  deadline: string;
+  progress: number;
+}
+
+interface CoordinationGoalsProps {
+  project: ProjectData;
+}
+
+const CoordinationGoals: React.FC<CoordinationGoalsProps> = ({ project }) => {
   const goals = [
     {
       name: 'MEP Coordination',
-      deadline: '2024-03-15',
-      progress: 75,
-      status: 'On Track',
+      deadline: project.deadline,
+      progress: Math.round(project.progress * 0.8),
+      status: project.progress >= 60 ? 'On Track' : 'At Risk',
     },
     {
       name: 'Structural Review',
-      deadline: '2024-03-20',
-      progress: 60,
-      status: 'At Risk',
+      deadline: project.deadline,
+      progress: Math.round(project.progress * 0.9),
+      status: project.progress >= 50 ? 'On Track' : 'At Risk',
     },
     {
       name: 'Architecture Sign-off',
-      deadline: '2024-03-25',
-      progress: 40,
-      status: 'On Track',
+      deadline: project.deadline,
+      progress: Math.round(project.progress * 0.7),
+      status: project.progress >= 40 ? 'On Track' : 'At Risk',
     },
   ];
 

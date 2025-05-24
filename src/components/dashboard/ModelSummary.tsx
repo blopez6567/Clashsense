@@ -2,18 +2,28 @@ import React from 'react';
 import { Building2, Users2, FileCheck2, AlertTriangle } from 'lucide-react';
 import Card, { CardHeader, CardContent } from '../ui/Card';
 
-const ModelSummary: React.FC = () => {
-  const stats = [
+interface ModelStats {
+  total: number;
+  updated: number;
+  reviewing: number;
+}
+
+interface ModelSummaryProps {
+  stats: ModelStats;
+}
+
+const ModelSummary: React.FC<ModelSummaryProps> = ({ stats }) => {
+  const summaryStats = [
     {
       name: 'Total Models',
-      value: '47',
-      change: '+3 this week',
+      value: stats.total.toString(),
+      change: `${stats.updated} updated`,
       icon: <Building2 size={24} className="text-blue-600 dark:text-blue-400" />,
     },
     {
       name: 'Team Members',
       value: '28',
-      change: '4 reviewing',
+      change: `${stats.reviewing} reviewing`,
       icon: <Users2 size={24} className="text-blue-600 dark:text-blue-400" />,
     },
     {
@@ -37,7 +47,7 @@ const ModelSummary: React.FC = () => {
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {stats.map((stat) => (
+          {summaryStats.map((stat) => (
             <div key={stat.name} className="bg-white dark:bg-slate-800 p-6 rounded-lg border border-slate-200 dark:border-slate-700">
               <div className="flex items-center">
                 <div className="p-2 rounded-lg bg-blue-50 dark:bg-blue-900/20">

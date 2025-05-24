@@ -2,20 +2,32 @@ import React, { useState } from 'react';
 import Card, { CardHeader, CardContent } from '../ui/Card';
 import { AlertOctagon, AlertTriangle, AlertCircle, ChevronDown, ChevronUp } from 'lucide-react';
 
-const ClashOverview: React.FC = () => {
+interface ClashStats {
+  total: number;
+  critical: number;
+  major: number;
+  minor: number;
+  resolved: number;
+}
+
+interface ClashOverviewProps {
+  stats: ClashStats;
+}
+
+const ClashOverview: React.FC<ClashOverviewProps> = ({ stats }) => {
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
 
   const clashCategories = [
     {
       severity: 'Critical',
-      count: 24,
+      count: stats.critical,
       description: 'Major structural conflicts',
       icon: <AlertOctagon className="text-red-500" size={20} />,
       color: 'bg-red-500',
       details: [
         {
           type: 'Structural-MEP Interference',
-          count: 12,
+          count: Math.round(stats.critical * 0.5),
           examples: [
             'Steel beam intersecting with main HVAC duct on Level 3',
             'Column clashing with primary electrical conduit in utility room',
@@ -25,7 +37,7 @@ const ClashOverview: React.FC = () => {
         },
         {
           type: 'Major Service Clashes',
-          count: 8,
+          count: Math.round(stats.critical * 0.33),
           examples: [
             'Main electrical busway conflicting with fire suppression main',
             'Primary chilled water line intersection with structural bracing',
@@ -35,7 +47,7 @@ const ClashOverview: React.FC = () => {
         },
         {
           type: 'Emergency System Conflicts',
-          count: 4,
+          count: Math.round(stats.critical * 0.17),
           examples: [
             'Fire sprinkler main blocked by structural elements',
             'Emergency exit pathway obstructed by mechanical equipment',
@@ -47,14 +59,14 @@ const ClashOverview: React.FC = () => {
     },
     {
       severity: 'Major',
-      count: 67,
+      count: stats.major,
       description: 'System interference issues',
       icon: <AlertTriangle className="text-amber-500" size={20} />,
       color: 'bg-amber-500',
       details: [
         {
           type: 'MEP System Conflicts',
-          count: 28,
+          count: Math.round(stats.major * 0.4),
           examples: [
             'Supply and return duct interference in ceiling space',
             'Multiple pipe crossings in congested areas',
@@ -64,7 +76,7 @@ const ClashOverview: React.FC = () => {
         },
         {
           type: 'Equipment Access Issues',
-          count: 22,
+          count: Math.round(stats.major * 0.35),
           examples: [
             'Insufficient clearance for AHU maintenance',
             'Electrical panel access space violations',
@@ -74,7 +86,7 @@ const ClashOverview: React.FC = () => {
         },
         {
           type: 'Installation Sequence Conflicts',
-          count: 17,
+          count: Math.round(stats.major * 0.25),
           examples: [
             'Overlapping installation space requirements',
             'Service access conflicts between trades',
@@ -86,14 +98,14 @@ const ClashOverview: React.FC = () => {
     },
     {
       severity: 'Minor',
-      count: 65,
+      count: stats.minor,
       description: 'Minor clearance issues',
       icon: <AlertCircle className="text-blue-500" size={20} />,
       color: 'bg-blue-500',
       details: [
         {
           type: 'Insulation Clearance',
-          count: 30,
+          count: Math.round(stats.minor * 0.45),
           examples: [
             'Pipe insulation overlap in non-critical areas',
             'Duct insulation clearance issues',
@@ -103,7 +115,7 @@ const ClashOverview: React.FC = () => {
         },
         {
           type: 'Non-critical Spacing',
-          count: 20,
+          count: Math.round(stats.minor * 0.35),
           examples: [
             'Minor pipe spacing violations',
             'Non-essential equipment clearance issues',
@@ -113,7 +125,7 @@ const ClashOverview: React.FC = () => {
         },
         {
           type: 'Aesthetic Conflicts',
-          count: 15,
+          count: Math.round(stats.minor * 0.2),
           examples: [
             'Ceiling grid alignment issues',
             'Visible service coordination in public spaces',
@@ -151,7 +163,7 @@ const ClashOverview: React.FC = () => {
                   <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2">
                     <div
                       className={`${category.color} h-2 rounded-full`}
-                      style={{ width: `${(category.count / 156) * 100}%` }}
+                      style={{ width: `${(category.count / stats.total) * 100}%` }}
                     ></div>
                   </div>
                   <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{category.description}</p>
@@ -199,9 +211,9 @@ const ClashOverview: React.FC = () => {
           <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-4">Most Affected Areas</h3>
           <div className="space-y-2">
             {[
-              { area: 'Mechanical Room - Level 2', clashes: 45 },
-              { area: 'Main Corridor - Level 1', clashes: 38 },
-              { area: 'Operating Theaters', clashes: 31 },
+              { area: 'Mechanical Room - Level 2', clashes: Math.round(stats.total * 0.3) },
+              { area: 'Main Corridor - Level 1', clashes: Math.round(stats.total * 0.25) },
+              { area: 'Operating Theaters', clashes: Math.round(stats.total * 0.2) },
             ].map((item) => (
               <div
                 key={item.area}
