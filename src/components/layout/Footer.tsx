@@ -10,13 +10,13 @@ const Footer: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="col-span-1">
             <Link to="/" className="flex items-center">
-              <Logo />
+              <Logo size={48} logoPath="/images/Clash Sense Logo No Text PNG No Background.png" />
               <span className="ml-2 text-xl font-semibold">
                 Clash<span className="text-blue-600">sense</span>
               </span>
             </Link>
             <p className="mt-4 text-sm text-slate-600 dark:text-slate-400 max-w-xs">
-              Empowering your financial future through innovative technology and user-centered design.
+              Empowering your MEP design through innovative technology and a user-centered interface.
             </p>
             <div className="mt-6 flex space-x-4">
               <a href="#" className="text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400" aria-label="Twitter">
