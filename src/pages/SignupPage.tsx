@@ -177,8 +177,8 @@ const SignupPage: React.FC = () => {
       </div>
       
       <div className="hidden lg:block relative w-0 flex-1 bg-white dark:bg-slate-800">
-        <div className="flex flex-col items-center justify-center h-full max-w-lg mx-auto px-8">
-          <div className="mb-12">
+        <div className="flex flex-col justify-center h-full max-w-lg mx-auto px-8">
+          <div className="mb-12 flex justify-center">
             <img 
               src="/images/Clash Sense Logo No Text PNG.png"
               alt="Clashsense Logo"
@@ -188,7 +188,7 @@ const SignupPage: React.FC = () => {
           <h2 className="text-3xl font-bold mb-8 text-slate-900 dark:text-white text-center">
             Join Clash<span className="text-blue-500">sense</span> Today
           </h2>
-          <div className="space-y-4 w-full max-w-md">
+          <div className="space-y-4 w-full max-w-md mx-auto">
             {benefits.map((benefit, index) => (
               <div key={index} className="flex items-start">
                 <div className="flex-shrink-0">
