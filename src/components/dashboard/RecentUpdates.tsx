@@ -121,7 +121,6 @@ const RecentUpdates: React.FC = () => {
   ];
 
   const dateRanges = [
-    { label: 'All', value: '0' },
     { label: 'Today', value: '1' },
     { label: 'Last 3 days', value: '3' },
     { label: 'Last week', value: '7' },
@@ -129,7 +128,6 @@ const RecentUpdates: React.FC = () => {
   ];
 
   const disciplines = [
-    { code: 'ALL', name: 'All' },
     { code: 'MECH', name: 'Mechanical' },
     { code: 'ELEC', name: 'Electrical' },
     { code: 'PLUMB', name: 'Plumbing' },
@@ -161,23 +159,11 @@ const RecentUpdates: React.FC = () => {
     return daysDiff < days;
   };
 
-  const toggleDiscipline = (code: string) => {
-    if (code === 'ALL') {
-      setSelectedDisciplines([]);
-    } else {
-      setSelectedDisciplines(prev =>
-        prev.includes(code)
-          ? prev.filter(d => d !== code)
-          : [...prev, code]
-      );
-    }
-  };
-
   const filteredUpdates = updates.filter(update => {
     const matchesDiscipline = selectedDisciplines.length === 0 || 
       selectedDisciplines.includes(update.discipline);
     
-    const matchesDate = !selectedDateRange || selectedDateRange === '0' || 
+    const matchesDate = !selectedDateRange || 
       isWithinDateRange(update.timestamp, parseInt(selectedDateRange));
     
     const matchesSearch = searchTerm === '' || 
@@ -192,6 +178,14 @@ const RecentUpdates: React.FC = () => {
     setSelectedDisciplines([]);
     setSelectedDateRange(null);
     setSearchTerm('');
+  };
+
+  const toggleDiscipline = (code: string) => {
+    setSelectedDisciplines(prev =>
+      prev.includes(code)
+        ? prev.filter(d => d !== code)
+        : [...prev, code]
+    );
   };
 
   const formatDate = (timestamp: string) => {
@@ -262,13 +256,9 @@ const RecentUpdates: React.FC = () => {
                       key={discipline.code}
                       onClick={() => toggleDiscipline(discipline.code)}
                       className={`px-3 py-1.5 text-sm font-medium rounded-full transition-colors ${
-                        discipline.code === 'ALL'
-                          ? selectedDisciplines.length === 0
-                            ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200'
-                            : 'bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'
-                          : selectedDisciplines.includes(discipline.code)
-                            ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200'
-                            : 'bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'
+                        selectedDisciplines.includes(discipline.code)
+                          ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200'
+                          : 'bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'
                       }`}
                     >
                       {discipline.name}
