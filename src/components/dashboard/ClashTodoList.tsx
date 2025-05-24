@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Card, { CardHeader, CardContent } from '../ui/Card';
-import { CheckCircle2, AlertCircle, Filter, ChevronRight } from 'lucide-react';
+import { CheckCircle2, AlertCircle, Filter, ChevronRight, AlertTriangle } from 'lucide-react';
 import Button from '../ui/Button';
 
 interface ClashTask {
@@ -16,12 +16,19 @@ const ClashTodoList: React.FC = () => {
   const [selectedDisciplines, setSelectedDisciplines] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
   const [expandedDiscipline, setExpandedDiscipline] = useState<string | null>(null);
+  const [selectedPriority, setSelectedPriority] = useState<string | null>(null);
 
   const disciplines = [
     { code: 'MECH', name: 'Mechanical' },
     { code: 'PL', name: 'Plumbing' },
     { code: 'EL', name: 'Electrical' },
     { code: 'FP', name: 'Fire Protection' }
+  ];
+
+  const priorities = [
+    { value: 'high', label: 'High Priority' },
+    { value: 'medium', label: 'Medium Priority' },
+    { value: 'low', label: 'Low Priority' }
   ];
 
   // Simulated larger dataset
@@ -128,17 +135,28 @@ const ClashTodoList: React.FC = () => {
   const toggleDiscipline = (discipline: string) => {
     if (expandedDiscipline === discipline) {
       setExpandedDiscipline(null);
+      setSelectedPriority(null);
     } else {
       setExpandedDiscipline(discipline);
       setSelectedDisciplines([discipline]);
     }
   };
 
-  const filteredTasks = allTasks.filter(task =>
-    expandedDiscipline 
+  const togglePriority = (priority: string) => {
+    setSelectedPriority(selectedPriority === priority ? null : priority);
+  };
+
+  const filteredTasks = allTasks.filter(task => {
+    const disciplineMatch = expandedDiscipline 
       ? task.discipline === expandedDiscipline
-      : selectedDisciplines.length === 0 || selectedDisciplines.includes(task.discipline)
-  );
+      : selectedDisciplines.length === 0 || selectedDisciplines.includes(task.discipline);
+    
+    const priorityMatch = selectedPriority
+      ? task.severity === selectedPriority
+      : true;
+
+    return disciplineMatch && priorityMatch;
+  });
 
   // Show only 4 tasks in preview mode
   const displayedTasks = expandedDiscipline ? filteredTasks : filteredTasks.slice(0, 4);
@@ -160,6 +178,13 @@ const ClashTodoList: React.FC = () => {
     return allTasks.filter(task => task.discipline === discipline).length;
   };
 
+  const getPriorityTaskCount = (priority: string) => {
+    return allTasks.filter(task => 
+      task.severity === priority && 
+      task.discipline === expandedDiscipline
+    ).length;
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -175,7 +200,10 @@ const ClashTodoList: React.FC = () => {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setExpandedDiscipline(null)}
+                onClick={() => {
+                  setExpandedDiscipline(null);
+                  setSelectedPriority(null);
+                }}
               >
                 Back to Overview
               </Button>
@@ -186,28 +214,52 @@ const ClashTodoList: React.FC = () => {
               leftIcon={<Filter size={16} />}
               onClick={() => setShowFilters(!showFilters)}
             >
-              Filter by Discipline
+              Filter
             </Button>
           </div>
         </div>
         {showFilters && (
-          <div className="mt-4 flex flex-wrap gap-2">
-            {disciplines.map(discipline => (
-              <button
-                key={discipline.code}
-                onClick={() => toggleDiscipline(discipline.code)}
-                className={`px-3 py-1.5 text-sm font-medium rounded-full transition-colors flex items-center ${
-                  expandedDiscipline === discipline.code
-                    ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200'
-                    : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
-                }`}
-              >
-                {discipline.code}
-                <span className="ml-2 px-1.5 py-0.5 text-xs rounded-full bg-slate-200 dark:bg-slate-700">
-                  {getDisciplineTaskCount(discipline.code)}
-                </span>
-              </button>
-            ))}
+          <div className="mt-4 space-y-4">
+            <div className="flex flex-wrap gap-2">
+              {disciplines.map(discipline => (
+                <button
+                  key={discipline.code}
+                  onClick={() => toggleDiscipline(discipline.code)}
+                  className={`px-3 py-1.5 text-sm font-medium rounded-full transition-colors flex items-center ${
+                    expandedDiscipline === discipline.code
+                      ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200'
+                      : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                  }`}
+                >
+                  {discipline.code}
+                  <span className="ml-2 px-1.5 py-0.5 text-xs rounded-full bg-slate-200 dark:bg-slate-700">
+                    {getDisciplineTaskCount(discipline.code)}
+                  </span>
+                </button>
+              ))}
+            </div>
+            
+            {expandedDiscipline && (
+              <div className="flex flex-wrap gap-2 pt-2 border-t border-slate-200 dark:border-slate-700">
+                {priorities.map(priority => (
+                  <button
+                    key={priority.value}
+                    onClick={() => togglePriority(priority.value)}
+                    className={`px-3 py-1.5 text-sm font-medium rounded-full transition-colors flex items-center ${
+                      selectedPriority === priority.value
+                        ? `${getSeverityColor(priority.value)} font-semibold`
+                        : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                    }`}
+                  >
+                    <AlertTriangle size={14} className="mr-1" />
+                    {priority.label}
+                    <span className="ml-2 px-1.5 py-0.5 text-xs rounded-full bg-slate-200 dark:bg-slate-700">
+                      {getPriorityTaskCount(priority.value)}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </CardHeader>
