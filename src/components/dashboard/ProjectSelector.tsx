@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Users2, Calendar, Clock } from 'lucide-react';
+import { Users2, Calendar, Clock, ArrowLeft } from 'lucide-react';
 import { ProjectData } from '../../types';
+import Button from '../ui/Button';
 
 interface ProjectSelectorProps {
   onProjectChange: (project: ProjectData) => void;
@@ -191,70 +192,139 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({ onProjectChange }) =>
     onProjectChange(project);
   };
 
+  const handleBack = () => {
+    setSelectedProjectId(null);
+    // Keep the last selected project in the dashboard
+  };
+
+  const selectedProject = projects.find(p => p.id === selectedProjectId);
+
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-semibold text-slate-900 dark:text-white mb-6">Projects</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-h-[calc(100vh-200px)] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-600 scrollbar-track-transparent">
-        {projects.map((project) => (
-          <button
-            key={project.id}
-            onClick={() => handleProjectSelect(project)}
-            className={`bg-white dark:bg-slate-800 rounded-lg shadow-sm border-2 overflow-hidden hover:shadow-md transition-all duration-200 text-left ${
-              selectedProjectId === project.id
-                ? 'border-blue-500 dark:border-blue-400 shadow-md ring-2 ring-blue-500/20'
-                : 'border-slate-200 dark:border-slate-700'
-            }`}
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Projects</h2>
+        {selectedProjectId && (
+          <Button
+            variant="outline"
+            size="sm"
+            leftIcon={<ArrowLeft size={16} />}
+            onClick={handleBack}
           >
-            <div className="relative h-48 w-full">
-              <img 
-                src={project.image} 
-                alt={project.name}
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/30 to-transparent"></div>
-              <div className="absolute bottom-4 left-4 right-4">
-                <h3 className="text-lg font-semibold text-white">{project.name}</h3>
-                <p className="text-sm text-white/80">{project.client}</p>
-              </div>
-            </div>
-            <div className="p-4">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center text-sm text-slate-600 dark:text-slate-400">
-                  <Users2 className="h-4 w-4 mr-1" />
-                  {project.teamSize} members
-                </div>
-                <div className="flex items-center text-sm text-slate-600 dark:text-slate-400">
-                  <Calendar className="h-4 w-4 mr-1" />
-                  {new Date(project.lastUpdated).toLocaleDateString()}
-                </div>
-              </div>
-              <div className="space-y-3">
-                <div>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className="text-slate-600 dark:text-slate-400">Progress</span>
-                    <span className="font-medium text-slate-900 dark:text-white">{project.progress}%</span>
-                  </div>
-                  <div className="h-2 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
-                    <div
-                      className={`h-full rounded-full ${
-                        selectedProjectId === project.id
-                          ? 'bg-blue-500'
-                          : 'bg-blue-400'
-                      }`}
-                      style={{ width: `${project.progress}%` }}
-                    />
-                  </div>
-                </div>
-                <div className="flex items-center justify-between text-sm">
-                  <div className="flex items-center text-slate-600 dark:text-slate-400">
-                    <Clock className="h-4 w-4 mr-1" />
-                    {project.phase}
-                  </div>
+            View All Projects
+          </Button>
+        )}
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-h-[calc(100vh-200px)] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-600 scrollbar-track-transparent">
+        {selectedProjectId ? (
+          // Show only the selected project
+          selectedProject && (
+            <button
+              key={selectedProject.id}
+              onClick={() => handleProjectSelect(selectedProject)}
+              className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border-2 overflow-hidden hover:shadow-md transition-all duration-200 text-left border-blue-500 dark:border-blue-400 shadow-md ring-2 ring-blue-500/20"
+            >
+              <div className="relative h-48 w-full">
+                <img 
+                  src={selectedProject.image} 
+                  alt={selectedProject.name}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/30 to-transparent"></div>
+                <div className="absolute bottom-4 left-4 right-4">
+                  <h3 className="text-lg font-semibold text-white">{selectedProject.name}</h3>
+                  <p className="text-sm text-white/80">{selectedProject.client}</p>
                 </div>
               </div>
-            </div>
-          </button>
-        ))}
+              <div className="p-4">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center text-sm text-slate-600 dark:text-slate-400">
+                    <Users2 className="h-4 w-4 mr-1" />
+                    {selectedProject.teamSize} members
+                  </div>
+                  <div className="flex items-center text-sm text-slate-600 dark:text-slate-400">
+                    <Calendar className="h-4 w-4 mr-1" />
+                    {new Date(selectedProject.lastUpdated).toLocaleDateString()}
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <div>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span className="text-slate-600 dark:text-slate-400">Progress</span>
+                      <span className="font-medium text-slate-900 dark:text-white">{selectedProject.progress}%</span>
+                    </div>
+                    <div className="h-2 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                      <div
+                        className="h-full rounded-full bg-blue-500"
+                        style={{ width: `${selectedProject.progress}%` }}
+                      />
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <div className="flex items-center text-slate-600 dark:text-slate-400">
+                      <Clock className="h-4 w-4 mr-1" />
+                      {selectedProject.phase}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </button>
+          )
+        ) : (
+          // Show all projects when none is selected
+          projects.map((project) => (
+            <button
+              key={project.id}
+              onClick={() => handleProjectSelect(project)}
+              className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border-2 overflow-hidden hover:shadow-md transition-all duration-200 text-left border-slate-200 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-500"
+            >
+              <div className="relative h-48 w-full">
+                <img 
+                  src={project.image} 
+                  alt={project.name}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/30 to-transparent"></div>
+                <div className="absolute bottom-4 left-4 right-4">
+                  <h3 className="text-lg font-semibold text-white">{project.name}</h3>
+                  <p className="text-sm text-white/80">{project.client}</p>
+                </div>
+              </div>
+              <div className="p-4">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center text-sm text-slate-600 dark:text-slate-400">
+                    <Users2 className="h-4 w-4 mr-1" />
+                    {project.teamSize} members
+                  </div>
+                  <div className="flex items-center text-sm text-slate-600 dark:text-slate-400">
+                    <Calendar className="h-4 w-4 mr-1" />
+                    {new Date(project.lastUpdated).toLocaleDateString()}
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <div>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span className="text-slate-600 dark:text-slate-400">Progress</span>
+                      <span className="font-medium text-slate-900 dark:text-white">{project.progress}%</span>
+                    </div>
+                    <div className="h-2 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                      <div
+                        className="h-full rounded-full bg-blue-400"
+                        style={{ width: `${project.progress}%` }}
+                      />
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <div className="flex items-center text-slate-600 dark:text-slate-400">
+                      <Clock className="h-4 w-4 mr-1" />
+                      {project.phase}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </button>
+          ))
+        )}
       </div>
     </div>
   );
