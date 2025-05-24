@@ -6,6 +6,7 @@ import RecentUpdates from '../components/dashboard/RecentUpdates';
 import XmlViewer from '../components/dashboard/XmlViewer';
 import ClashTodoList from '../components/dashboard/ClashTodoList';
 import ClashProgressTracker from '../components/dashboard/ClashProgressTracker';
+import ClashImageParser from '../components/dashboard/ClashImageParser';
 import ProjectSelector, { ProjectData } from '../components/dashboard/ProjectSelector';
 import Button from '../components/ui/Button';
 import { LayoutGrid, Layers } from 'lucide-react';
@@ -14,7 +15,6 @@ const DashboardPage: React.FC = () => {
   const [currentProject, setCurrentProject] = useState<ProjectData | null>(null);
   const [viewMode, setViewMode] = useState<'simple' | 'advanced'>('advanced');
 
-  // Update document title when component mounts
   React.useEffect(() => {
     document.title = 'Dashboard | ClashSense';
   }, []);
@@ -79,6 +79,7 @@ const DashboardPage: React.FC = () => {
             ) : (
               // Simple view with essential features
               <div className="space-y-6">
+                <ClashImageParser />
                 <XmlViewer />
                 <ClashTodoList project={currentProject} />
               </div>
