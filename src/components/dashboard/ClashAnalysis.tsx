@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Card, { CardHeader, CardContent } from '../ui/Card';
 import Button from '../ui/Button';
-import { Brain, Loader2, AlertTriangle, RefreshCw } from 'lucide-react';
+import { Brain, Loader2, AlertTriangle, RefreshCw, ChevronDown, ChevronUp } from 'lucide-react';
 
 interface ClashAnalysisProps {
   xmlData: any;
@@ -20,6 +20,7 @@ const INITIAL_DELAY = 2000; // 2 seconds
 const BATCH_SIZE = 3; // Process 3 clashes at a time
 
 const ClashAnalysis: React.FC<ClashAnalysisProps> = ({ xmlData }) => {
+  const [isExpanded, setIsExpanded] = useState(true);
   const [analysis, setAnalysis] = useState<AnalysisResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -149,87 +150,94 @@ const ClashAnalysis: React.FC<ClashAnalysisProps> = ({ xmlData }) => {
 
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="cursor-pointer" onClick={() => setIsExpanded(!isExpanded)}>
         <div className="flex justify-between items-center">
           <h2 className="text-xl font-semibold text-slate-900 dark:text-white">AI Clash Analysis</h2>
-          <Button
-            onClick={analyzeClashes}
-            disabled={loading || !xmlData}
-            leftIcon={loading ? (
-              retrying ? (
-                <RefreshCw className="animate-spin" size={16} />
-              ) : (
-                <Loader2 className="animate-spin" size={16} />
-              )
-            ) : (
-              <Brain size={16} />
-            )}
-          >
-            {loading ? (
-              retrying ? `Retrying (${retryCount}/${MAX_RETRIES})...` : 'Analyzing...'
-            ) : (
-              'Analyze Clashes'
-            )}
-          </Button>
+          <div className="flex items-center gap-2">
+            <div onClick={e => e.stopPropagation()}>
+              <Button
+                onClick={analyzeClashes}
+                disabled={loading || !xmlData}
+                leftIcon={loading ? (
+                  retrying ? (
+                    <RefreshCw className="animate-spin" size={16} />
+                  ) : (
+                    <Loader2 className="animate-spin" size={16} />
+                  )
+                ) : (
+                  <Brain size={16} />
+                )}
+              >
+                {loading ? (
+                  retrying ? `Retrying (${retryCount}/${MAX_RETRIES})...` : 'Analyzing...'
+                ) : (
+                  'Analyze Clashes'
+                )}
+              </Button>
+            </div>
+            {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+          </div>
         </div>
       </CardHeader>
-      <CardContent>
-        {error && (
-          <div className="p-4 mb-4 text-red-700 bg-red-100 dark:bg-red-900/30 dark:text-red-300 rounded-lg flex items-start gap-3">
-            <AlertTriangle className="flex-shrink-0 mt-1" size={20} />
-            <div>
-              <p className="font-medium">Analysis Failed</p>
-              <p className="mt-1">{error}</p>
-              {error.includes('rate limit') && (
-                <p className="mt-2 text-sm">
-                  The analysis is being rate limited. This usually happens when processing many clashes at once.
-                  Try again in a few minutes or consider uploading a smaller XML file.
-                </p>
-              )}
-            </div>
-          </div>
-        )}
-
-        {loading && progress.total > 0 && (
-          <div className="mb-4">
-            <div className="h-2 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-blue-500 transition-all duration-300"
-                style={{ width: `${(progress.current / progress.total) * 100}%` }}
-              />
-            </div>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">
-              Analyzing clashes: {progress.current} of {progress.total}
-            </p>
-          </div>
-        )}
-
-        {analysis && (
-          <div className="prose dark:prose-invert max-w-none">
-            <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-6">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-medium text-slate-900 dark:text-white m-0">
-                  Analysis Results
-                </h3>
-                {analysis.analyzedClashes < analysis.totalClashes && (
-                  <span className="text-sm text-slate-500 dark:text-slate-400">
-                    Analyzed {analysis.analyzedClashes} of {analysis.totalClashes} clashes
-                  </span>
+      {isExpanded && (
+        <CardContent>
+          {error && (
+            <div className="p-4 mb-4 text-red-700 bg-red-100 dark:bg-red-900/30 dark:text-red-300 rounded-lg flex items-start gap-3">
+              <AlertTriangle className="flex-shrink-0 mt-1" size={20} />
+              <div>
+                <p className="font-medium">Analysis Failed</p>
+                <p className="mt-1">{error}</p>
+                {error.includes('rate limit') && (
+                  <p className="mt-2 text-sm">
+                    The analysis is being rate limited. This usually happens when processing many clashes at once.
+                    Try again in a few minutes or consider uploading a smaller XML file.
+                  </p>
                 )}
               </div>
-              <div className="whitespace-pre-wrap text-slate-700 dark:text-slate-300">
-                {analysis.analysis}
+            </div>
+          )}
+
+          {loading && progress.total > 0 && (
+            <div className="mb-4">
+              <div className="h-2 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-blue-500 transition-all duration-300"
+                  style={{ width: `${(progress.current / progress.total) * 100}%` }}
+                />
+              </div>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">
+                Analyzing clashes: {progress.current} of {progress.total}
+              </p>
+            </div>
+          )}
+
+          {analysis && (
+            <div className="prose dark:prose-invert max-w-none">
+              <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-medium text-slate-900 dark:text-white m-0">
+                    Analysis Results
+                  </h3>
+                  {analysis.analyzedClashes < analysis.totalClashes && (
+                    <span className="text-sm text-slate-500 dark:text-slate-400">
+                      Analyzed {analysis.analyzedClashes} of {analysis.totalClashes} clashes
+                    </span>
+                  )}
+                </div>
+                <div className="whitespace-pre-wrap text-slate-700 dark:text-slate-300">
+                  {analysis.analysis}
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {!analysis && !error && !loading && (
-          <div className="text-center py-12 text-slate-500 dark:text-slate-400">
-            Upload an XML file and click "Analyze Clashes" to get AI-powered resolution suggestions
-          </div>
-        )}
-      </CardContent>
+          {!analysis && !error && !loading && (
+            <div className="text-center py-12 text-slate-500 dark:text-slate-400">
+              Upload an XML file and click "Analyze Clashes" to get AI-powered resolution suggestions
+            </div>
+          )}
+        </CardContent>
+      )}
     </Card>
   );
 };
