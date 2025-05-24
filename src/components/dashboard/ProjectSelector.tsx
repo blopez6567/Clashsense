@@ -11,6 +11,7 @@ export interface ProjectData {
   progress: number;
   phase: string;
   deadline: string;
+  image: string;
   modelStats: {
     total: number;
     updated: number;
@@ -48,6 +49,7 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({ onProjectChange }) =>
       progress: 65,
       phase: 'Construction Documentation',
       deadline: '2024-08-30',
+      image: 'https://images.pexels.com/photos/668298/pexels-photo-668298.jpeg',
       modelStats: {
         total: 47,
         updated: 42,
@@ -76,6 +78,7 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({ onProjectChange }) =>
       progress: 42,
       phase: 'Design Development',
       deadline: '2024-12-15',
+      image: 'https://images.pexels.com/photos/1738434/pexels-photo-1738434.jpeg',
       modelStats: {
         total: 32,
         updated: 28,
@@ -104,6 +107,7 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({ onProjectChange }) =>
       progress: 88,
       phase: 'Construction Administration',
       deadline: '2024-06-30',
+      image: 'https://images.pexels.com/photos/273209/pexels-photo-273209.jpeg',
       modelStats: {
         total: 56,
         updated: 53,
@@ -140,8 +144,13 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({ onProjectChange }) =>
         className="w-full flex items-center justify-between p-4 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
       >
         <div className="flex items-center space-x-4">
-          <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-            <Building2 className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+          <div className="relative w-16 h-16 rounded-lg overflow-hidden">
+            <img 
+              src={selectedProject.image} 
+              alt={selectedProject.name}
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
           </div>
           <div className="text-left">
             <h3 className="font-medium text-slate-900 dark:text-white">{selectedProject.name}</h3>
@@ -161,7 +170,7 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({ onProjectChange }) =>
       {isOpen && (
         <div className="absolute top-full left-0 right-0 mt-2 z-50">
           <Card>
-            <div className="max-h-96 overflow-y-auto divide-y divide-slate-200 dark:divide-slate-700">
+            <div className="max-h-[calc(100vh-200px)] overflow-y-auto divide-y divide-slate-200 dark:divide-slate-700">
               {projects.map((project) => (
                 <button
                   key={project.id}
@@ -170,8 +179,13 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({ onProjectChange }) =>
                     project.id === selectedProject.id ? 'bg-slate-50 dark:bg-slate-700/50' : ''
                   }`}
                 >
-                  <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-                    <Building2 className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                  <div className="relative w-24 h-24 rounded-lg overflow-hidden flex-shrink-0">
+                    <img 
+                      src={project.image} 
+                      alt={project.name}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
                   </div>
                   <div className="flex-1 text-left">
                     <h3 className="font-medium text-slate-900 dark:text-white">{project.name}</h3>
