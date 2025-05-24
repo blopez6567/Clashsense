@@ -9,6 +9,7 @@ const ClashImageParser: React.FC = () => {
   const [analysis, setAnalysis] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
@@ -18,6 +19,7 @@ const ClashImageParser: React.FC = () => {
     setPreviewUrl(URL.createObjectURL(file));
     setIsLoading(true);
     setAnalysis(null);
+    setError(null);
 
     try {
       const formData = new FormData();
@@ -32,14 +34,15 @@ const ClashImageParser: React.FC = () => {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to analyze image');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `Server responded with status ${response.status}`);
       }
 
       const data = await response.json();
       setAnalysis(data.analysis);
     } catch (error) {
       console.error('Error analyzing image:', error);
-      setAnalysis('Failed to analyze image. Please try again.');
+      setError(error instanceof Error ? error.message : 'Failed to analyze image. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -101,6 +104,22 @@ const ClashImageParser: React.FC = () => {
               <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
                 Analyzing clash image...
               </p>
+            </div>
+          )}
+
+          {error && (
+            <div className="mt-6">
+              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+                <p className="text-red-600 dark:text-red-400">
+                  {error}
+                </p>
+              </div>
+              <Button className="mt-4" onClick={() => {
+                setPreviewUrl(null);
+                setError(null);
+              }}>
+                Try Again
+              </Button>
             </div>
           )}
 
