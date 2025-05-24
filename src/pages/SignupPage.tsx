@@ -179,7 +179,11 @@ const SignupPage: React.FC = () => {
       <div className="hidden lg:block relative w-0 flex-1 bg-white dark:bg-slate-800">
         <div className="flex flex-col items-center justify-center h-full max-w-lg mx-auto px-8">
           <div className="mb-12">
-            <Logo size={400} showText={false} logoPath="/images/Clash Sense Logo No Text PNG.png" />
+            <img 
+              src="https://stackblitz.com/storage/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBBejFEL3c9PSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--de5d0a726a80f0ade61ead2e080b0b93d642d55a//Clash Sense Logo No Text PNG.png"
+              alt="Clashsense Logo"
+              className="w-[400px] h-auto"
+            />
           </div>
           <h2 className="text-3xl font-bold mb-8 text-slate-900 dark:text-white text-center">
             Join Clash<span className="text-blue-500">sense</span> Today
