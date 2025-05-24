@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { XMLParser } from 'fast-xml-parser';
 import Card, { CardHeader, CardContent } from '../ui/Card';
-import { Upload, FileCheck, AlertCircle, BarChart4, ListFilter, X } from 'lucide-react';
+import { Upload, FileCheck, AlertCircle, BarChart4, ListFilter, X, ChevronDown, ChevronUp } from 'lucide-react';
 import Button from '../ui/Button';
 import ClashAnalysis from './ClashAnalysis';
 
@@ -14,6 +14,7 @@ interface ClashStats {
 }
 
 const XmlViewer: React.FC = () => {
+  const [isExpanded, setIsExpanded] = useState(true);
   const [xmlData, setXmlData] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
@@ -177,7 +178,7 @@ const XmlViewer: React.FC = () => {
   return (
     <div className="space-y-6">
       <Card>
-        <CardHeader>
+        <CardHeader className="cursor-pointer" onClick={() => setIsExpanded(!isExpanded)}>
           <div className="flex justify-between items-center">
             <h2 className="text-xl font-semibold text-slate-900 dark:text-white">XML Model Data</h2>
             <div className="flex items-center gap-4">
@@ -187,7 +188,10 @@ const XmlViewer: React.FC = () => {
                     {fileName}
                   </span>
                   <button
-                    onClick={clearFile}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      clearFile();
+                    }}
                     className="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition-colors"
                     aria-label="Remove file"
                   >
@@ -195,7 +199,7 @@ const XmlViewer: React.FC = () => {
                   </button>
                 </div>
               )}
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
                 <Button
                   variant={viewMode === 'analytics' ? 'primary' : 'outline'}
                   size="sm"
@@ -229,44 +233,47 @@ const XmlViewer: React.FC = () => {
                   {xmlData ? 'Change File' : 'Upload XML'}
                 </Button>
               </div>
+              {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
             </div>
           </div>
         </CardHeader>
-        <CardContent>
-          {error && (
-            <div className="flex items-center p-4 text-amber-800 bg-amber-100 dark:bg-amber-900/30 dark:text-amber-300 rounded-lg">
-              <AlertCircle size={20} className="mr-2" />
-              {error}
-            </div>
-          )}
-          
-          {xmlData && (
-            <div className="mt-4">
-              <div className="flex items-center text-emerald-600 dark:text-emerald-400 mb-4">
-                <FileCheck size={20} className="mr-2" />
-                XML file parsed successfully
-                {clashStats && (
-                  <span className="ml-2 text-sm">
-                    ({clashStats.total} clashes found)
-                  </span>
+        {isExpanded && (
+          <CardContent>
+            {error && (
+              <div className="flex items-center p-4 text-amber-800 bg-amber-100 dark:bg-amber-900/30 dark:text-amber-300 rounded-lg">
+                <AlertCircle size={20} className="mr-2" />
+                {error}
+              </div>
+            )}
+            
+            {xmlData && (
+              <div className="mt-4">
+                <div className="flex items-center text-emerald-600 dark:text-emerald-400 mb-4">
+                  <FileCheck size={20} className="mr-2" />
+                  XML file parsed successfully
+                  {clashStats && (
+                    <span className="ml-2 text-sm">
+                      ({clashStats.total} clashes found)
+                    </span>
+                  )}
+                </div>
+                {viewMode === 'analytics' ? (
+                  renderAnalytics()
+                ) : (
+                  <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-4 overflow-auto max-h-96">
+                    {renderValue(xmlData)}
+                  </div>
                 )}
               </div>
-              {viewMode === 'analytics' ? (
-                renderAnalytics()
-              ) : (
-                <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-4 overflow-auto max-h-96">
-                  {renderValue(xmlData)}
-                </div>
-              )}
-            </div>
-          )}
-          
-          {!xmlData && !error && (
-            <div className="text-center py-12 text-slate-500 dark:text-slate-400">
-              Upload an XML file to view its contents and analytics
-            </div>
-          )}
-        </CardContent>
+            )}
+            
+            {!xmlData && !error && (
+              <div className="text-center py-12 text-slate-500 dark:text-slate-400">
+                Upload an XML file to view its contents and analytics
+              </div>
+            )}
+          </CardContent>
+        )}
       </Card>
 
       {xmlData && <ClashAnalysis xmlData={xmlData} />}
