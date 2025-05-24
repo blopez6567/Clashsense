@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Users2, Calendar, Clock, ArrowLeft, Building2 } from 'lucide-react';
+import { Users2, Calendar, Clock, ArrowLeft, Building2, ChevronDown } from 'lucide-react';
 import { ProjectData } from '../../types';
 import Button from '../ui/Button';
 
@@ -10,15 +10,29 @@ interface ProjectSelectorProps {
 const ProjectSelector: React.FC<ProjectSelectorProps> = ({ onProjectChange }) => {
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
   const [showStickyHeader, setShowStickyHeader] = useState(false);
+  const [showProjectDropdown, setShowProjectDropdown] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
       const scrollPosition = window.scrollY;
-      setShowStickyHeader(scrollPosition > 200); // Show after scrolling 200px
+      setShowStickyHeader(scrollPosition > 200);
     };
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const dropdown = document.getElementById('project-dropdown');
+      if (dropdown && !dropdown.contains(event.target as Node)) {
+        setShowProjectDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   const projects: ProjectData[] = [
@@ -201,11 +215,11 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({ onProjectChange }) =>
   const handleProjectSelect = (project: ProjectData) => {
     setSelectedProjectId(project.id);
     onProjectChange(project);
+    setShowProjectDropdown(false);
   };
 
   const handleBack = () => {
     setSelectedProjectId(null);
-    // Keep the last selected project in the dashboard
   };
 
   const selectedProject = projects.find(p => p.id === selectedProjectId);
@@ -217,23 +231,62 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({ onProjectChange }) =>
         <div className="fixed top-16 left-0 right-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm z-40 border-b border-slate-200 dark:border-slate-700 shadow-sm transition-all duration-300">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
             <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <div className="w-10 h-10 rounded-lg overflow-hidden">
-                  <img 
-                    src={selectedProject.image} 
-                    alt={selectedProject.name}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div>
-                  <h3 className="text-sm font-medium text-slate-900 dark:text-white">{selectedProject.name}</h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">{selectedProject.client}</p>
-                </div>
+              <div className="relative">
+                <button
+                  onClick={() => setShowProjectDropdown(!showProjectDropdown)}
+                  className="flex items-center space-x-4 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg p-2 transition-colors"
+                >
+                  <div className="w-10 h-10 rounded-lg overflow-hidden">
+                    <img 
+                      src={selectedProject.image} 
+                      alt={selectedProject.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium text-slate-900 dark:text-white">{selectedProject.name}</h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">{selectedProject.client}</p>
+                  </div>
+                  <ChevronDown className="h-4 w-4 text-slate-400" />
+                </button>
+
+                {/* Project Dropdown */}
+                {showProjectDropdown && (
+                  <div 
+                    id="project-dropdown"
+                    className="absolute top-full left-0 mt-2 w-80 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden"
+                  >
+                    <div className="max-h-96 overflow-y-auto">
+                      {projects.map((project) => (
+                        <button
+                          key={project.id}
+                          onClick={() => handleProjectSelect(project)}
+                          className={`w-full flex items-center space-x-3 p-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors ${
+                            project.id === selectedProject.id ? 'bg-slate-50 dark:bg-slate-700/50' : ''
+                          }`}
+                        >
+                          <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
+                            <img 
+                              src={project.image} 
+                              alt={project.name}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <div className="flex-1 text-left">
+                            <h4 className="text-sm font-medium text-slate-900 dark:text-white">{project.name}</h4>
+                            <p className="text-xs text-slate-500 dark:text-slate-400">{project.client}</p>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
-              <div className="flex items-center space-x-4">
+
+              <div className="flex items-center space-x-6">
                 <div className="flex items-center space-x-2 text-sm text-slate-600 dark:text-slate-400">
                   <Users2 className="h-4 w-4" />
-                  <span>{selectedProject.teamSize}</span>
+                  <span>{selectedProject.teamSize} members</span>
                 </div>
                 <div className="flex items-center space-x-2 text-sm text-slate-600 dark:text-slate-400">
                   <Building2 className="h-4 w-4" />
@@ -245,7 +298,7 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({ onProjectChange }) =>
                   leftIcon={<ArrowLeft size={16} />}
                   onClick={handleBack}
                 >
-                  Change Project
+                  View All
                 </Button>
               </div>
             </div>
