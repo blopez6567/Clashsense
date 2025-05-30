@@ -8,7 +8,6 @@ import ClashTodoList from '../components/dashboard/ClashTodoList';
 import ClashProgressTracker from '../components/dashboard/ClashProgressTracker';
 import ClashImageParser from '../components/dashboard/ClashImageParser';
 import BcfExporter from '../components/dashboard/BcfExporter';
-import ClashEmbeddings from '../components/dashboard/ClashEmbeddings';
 import ProjectSelector, { ProjectData } from '../components/dashboard/ProjectSelector';
 import Button from '../components/ui/Button';
 import { LayoutGrid, Layers } from 'lucide-react';
@@ -90,12 +89,6 @@ const DashboardPage: React.FC = () => {
                     projectName={currentProject.name}
                   />
                 </div>
-
-                <div className="clash-embeddings">
-                  <ClashEmbeddings 
-                    clashes={currentProject.clashes || []}
-                  />
-                </div>
                 
                 <div className="recent-updates">
                   <RecentUpdates project={currentProject} />
@@ -116,11 +109,6 @@ const DashboardPage: React.FC = () => {
                   <BcfExporter 
                     clashes={currentProject.clashes || []} 
                     projectName={currentProject.name}
-                  />
-                </div>
-                <div className="clash-embeddings">
-                  <ClashEmbeddings 
-                    clashes={currentProject.clashes || []}
                   />
                 </div>
               </div>
