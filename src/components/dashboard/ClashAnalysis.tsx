@@ -220,7 +220,7 @@ const ClashAnalysis: React.FC<ClashAnalysisProps> = ({ xmlData }) => {
                 disabled={loading || !xmlData}
                 leftIcon={loading ? (
                   retrying ? (
-                    <RefreshCw className="animate-spin" size={16} />
+                    <RefreshCw className="animate-spin\" size={16} />
                   ) : (
                     <Loader2 className="animate-spin" size={16} />
                   )
@@ -243,7 +243,7 @@ const ClashAnalysis: React.FC<ClashAnalysisProps> = ({ xmlData }) => {
         <CardContent>
           {error && (
             <div className="p-4 mb-4 text-red-700 bg-red-100 dark:bg-red-900/30 dark:text-red-300 rounded-lg flex items-start gap-3">
-              <AlertTriangle className="flex-shrink-0 mt-1" size={20} />
+              <AlertTriangle className="flex-shrink-0 mt-1\" size={20} />
               <div>
                 <p className="font-medium">Analysis Failed</p>
                 <p className="mt-1">{error}</p>
