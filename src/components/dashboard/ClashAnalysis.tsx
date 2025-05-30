@@ -13,11 +13,20 @@ interface AnalysisResponse {
   totalClashes: number;
   error?: string;
   message?: string;
+  mlSuggestions?: Array<{
+    id: string;
+    confidence: number;
+    suggestion: string;
+    precedents: Array<{
+      description: string;
+      similarity: number;
+    }>;
+  }>;
 }
 
 const MAX_RETRIES = 3;
-const INITIAL_DELAY = 2000; // 2 seconds
-const BATCH_SIZE = 3; // Process 3 clashes at a time
+const INITIAL_DELAY = 2000;
+const BATCH_SIZE = 3;
 
 const ClashAnalysis: React.FC<ClashAnalysisProps> = ({ xmlData }) => {
   const [isExpanded, setIsExpanded] = useState(true);
@@ -37,7 +46,11 @@ const ClashAnalysis: React.FC<ClashAnalysisProps> = ({ xmlData }) => {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
       },
-      body: JSON.stringify({ clashData: clashBatch }),
+      body: JSON.stringify({ 
+        clashData: clashBatch,
+        enableMl: true, // Enable ML-powered analysis
+        includeHistory: true // Include historical resolution data
+      }),
     });
 
     const data = await response.json();
@@ -94,15 +107,20 @@ const ClashAnalysis: React.FC<ClashAnalysisProps> = ({ xmlData }) => {
 
       let combinedAnalysis = '';
       let totalAnalyzed = 0;
+      let mlSuggestions: AnalysisResponse['mlSuggestions'] = [];
 
       for (let i = 0; i < clashes.length; i += BATCH_SIZE) {
         try {
           const batchResult = await processBatch(clashes, i);
           combinedAnalysis += (combinedAnalysis ? '\n\n' : '') + batchResult.analysis;
           totalAnalyzed += batchResult.analyzedClashes;
+          
+          if (batchResult.mlSuggestions) {
+            mlSuggestions = [...mlSuggestions, ...batchResult.mlSuggestions];
+          }
+          
           setProgress({ current: totalAnalyzed, total: clashes.length });
           
-          // Small delay between batches to avoid rate limits
           if (i + BATCH_SIZE < clashes.length) {
             await sleep(1000);
           }
@@ -120,7 +138,8 @@ const ClashAnalysis: React.FC<ClashAnalysisProps> = ({ xmlData }) => {
       setAnalysis({
         analysis: combinedAnalysis,
         analyzedClashes: totalAnalyzed,
-        totalClashes: clashes.length
+        totalClashes: clashes.length,
+        mlSuggestions
       });
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to analyze clashes';
@@ -146,6 +165,47 @@ const ClashAnalysis: React.FC<ClashAnalysisProps> = ({ xmlData }) => {
         elements: clash.elements
       }))
     };
+  };
+
+  const renderMlSuggestions = (suggestions: AnalysisResponse['mlSuggestions']) => {
+    if (!suggestions || suggestions.length === 0) return null;
+
+    return (
+      <div className="mt-6 space-y-4">
+        <h3 className="text-lg font-medium text-slate-900 dark:text-white">
+          ML-Powered Resolution Suggestions
+        </h3>
+        {suggestions.map((suggestion) => (
+          <div key={suggestion.id} className="bg-slate-50 dark:bg-slate-800 rounded-lg p-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="font-medium text-slate-900 dark:text-white">
+                Clash #{suggestion.id}
+              </span>
+              <span className="text-sm text-slate-500 dark:text-slate-400">
+                {suggestion.confidence}% confidence
+              </span>
+            </div>
+            <p className="text-slate-700 dark:text-slate-300 mb-4">
+              {suggestion.suggestion}
+            </p>
+            {suggestion.precedents.length > 0 && (
+              <div>
+                <h4 className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  Similar Past Resolutions:
+                </h4>
+                <div className="space-y-2">
+                  {suggestion.precedents.map((precedent, index) => (
+                    <div key={index} className="text-sm text-slate-600 dark:text-slate-400">
+                      • {precedent.description} ({precedent.similarity}% similar)
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    );
   };
 
   return (
@@ -227,6 +287,7 @@ const ClashAnalysis: React.FC<ClashAnalysisProps> = ({ xmlData }) => {
                 <div className="whitespace-pre-wrap text-slate-700 dark:text-slate-300">
                   {analysis.analysis}
                 </div>
+                {analysis.mlSuggestions && renderMlSuggestions(analysis.mlSuggestions)}
               </div>
             </div>
           )}
