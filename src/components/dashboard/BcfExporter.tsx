@@ -114,7 +114,7 @@ const BcfExporter: React.FC<BcfExporterProps> = ({ clashes, projectName }) => {
           <Button
             onClick={exportBcf}
             disabled={isExporting || clashes.length === 0}
-            leftIcon={isExporting ? <Loader2 className="animate-spin" size={16} /> : <Download size={16} />}
+            leftIcon={isExporting ? <Loader2 className="animate-spin\" size={16} /> : <Download size={16} />}
           >
             {isExporting ? 'Exporting...' : 'Export BCF'}
           </Button>
