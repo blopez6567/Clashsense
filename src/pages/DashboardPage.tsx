@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import ModelSummary from '../components/dashboard/ModelSummary';
 import ClashOverview from '../components/dashboard/ClashOverview';
 import CoordinationGoals from '../components/dashboard/CoordinationGoals';
@@ -7,7 +7,6 @@ import XmlViewer from '../components/dashboard/XmlViewer';
 import ClashTodoList from '../components/dashboard/ClashTodoList';
 import ClashProgressTracker from '../components/dashboard/ClashProgressTracker';
 import ClashImageParser from '../components/dashboard/ClashImageParser';
-import DashboardTour from '../components/dashboard/DashboardTour';
 import ProjectSelector, { ProjectData } from '../components/dashboard/ProjectSelector';
 import Button from '../components/ui/Button';
 import { LayoutGrid, Layers } from 'lucide-react';
@@ -15,13 +14,6 @@ import { LayoutGrid, Layers } from 'lucide-react';
 const DashboardPage: React.FC = () => {
   const [currentProject, setCurrentProject] = useState<ProjectData | null>(null);
   const [viewMode, setViewMode] = useState<'simple' | 'advanced'>('advanced');
-  const [isFirstVisit, setIsFirstVisit] = useState(true);
-
-  useEffect(() => {
-    document.title = 'Dashboard | ClashSense';
-    const tourCompleted = localStorage.getItem('dashboardTourCompleted');
-    setIsFirstVisit(!tourCompleted);
-  }, []);
 
   const handleProjectChange = (project: ProjectData) => {
     setCurrentProject(project);
@@ -29,8 +21,6 @@ const DashboardPage: React.FC = () => {
 
   return (
     <div className="bg-slate-50 dark:bg-slate-900 min-h-screen pt-24 pb-12">
-      <DashboardTour isFirstVisit={isFirstVisit} />
-      
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Dashboard</h2>
