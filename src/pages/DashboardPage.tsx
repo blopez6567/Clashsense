@@ -7,6 +7,7 @@ import XmlViewer from '../components/dashboard/XmlViewer';
 import ClashTodoList from '../components/dashboard/ClashTodoList';
 import ClashProgressTracker from '../components/dashboard/ClashProgressTracker';
 import ClashImageParser from '../components/dashboard/ClashImageParser';
+import BcfExporter from '../components/dashboard/BcfExporter';
 import ProjectSelector, { ProjectData } from '../components/dashboard/ProjectSelector';
 import Button from '../components/ui/Button';
 import { LayoutGrid, Layers } from 'lucide-react';
@@ -81,6 +82,13 @@ const DashboardPage: React.FC = () => {
                 <div className="xml-viewer">
                   <XmlViewer />
                 </div>
+
+                <div className="bcf-exporter">
+                  <BcfExporter 
+                    clashes={currentProject.clashes || []} 
+                    projectName={currentProject.name}
+                  />
+                </div>
                 
                 <div className="recent-updates">
                   <RecentUpdates project={currentProject} />
@@ -96,6 +104,12 @@ const DashboardPage: React.FC = () => {
                 </div>
                 <div className="clash-todo">
                   <ClashTodoList project={currentProject} />
+                </div>
+                <div className="bcf-exporter">
+                  <BcfExporter 
+                    clashes={currentProject.clashes || []} 
+                    projectName={currentProject.name}
+                  />
                 </div>
               </div>
             )}
