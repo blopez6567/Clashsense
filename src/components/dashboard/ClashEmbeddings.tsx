@@ -41,7 +41,7 @@ const ClashEmbeddings: React.FC<ClashEmbeddingsProps> = ({ clashes }) => {
           <Button
             onClick={handleGenerateEmbeddings}
             disabled={isProcessing || clashes.length === 0}
-            leftIcon={isProcessing ? <Loader2 className="animate-spin" size={16} /> : <Database size={16} />}
+            leftIcon={isProcessing ? <Loader2 className="animate-spin\" size={16} /> : <Database size={16} />}
           >
             {isProcessing ? 'Processing...' : 'Generate Embeddings'}
           </Button>
