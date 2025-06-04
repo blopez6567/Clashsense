@@ -8,16 +8,54 @@ import ClashTodoList from '../components/dashboard/ClashTodoList';
 import ClashProgressTracker from '../components/dashboard/ClashProgressTracker';
 import ClashImageParser from '../components/dashboard/ClashImageParser';
 import BcfExporter from '../components/dashboard/BcfExporter';
-import ProjectSelector, { ProjectData } from '../components/dashboard/ProjectSelector';
+import ProjectSelector from '../components/dashboard/ProjectSelector';
 import Button from '../components/ui/Button';
 import { LayoutGrid, Layers } from 'lucide-react';
+import { ProjectData, ClashTask } from '../types';
 
 const DashboardPage: React.FC = () => {
   const [currentProject, setCurrentProject] = useState<ProjectData | null>(null);
   const [viewMode, setViewMode] = useState<'simple' | 'advanced'>('advanced');
+  const [parsedXmlClashes, setParsedXmlClashes] = useState<ClashTask[]>([]);
 
   const handleProjectChange = (project: ProjectData) => {
     setCurrentProject(project);
+    // Reset parsed XML data when switching projects
+    setParsedXmlClashes([]);
+  };
+
+  const handleXmlDataParsed = (xmlData: any, clashes: ClashTask[]) => {
+    setParsedXmlClashes(clashes);
+    
+    if (currentProject) {
+      // Update clash statistics based on parsed data
+      const updatedProject = {
+        ...currentProject,
+        clashStats: {
+          total: clashes.length,
+          critical: clashes.filter(c => c.severity === 'high').length,
+          major: clashes.filter(c => c.severity === 'medium').length,
+          minor: clashes.filter(c => c.severity === 'low').length,
+          resolved: clashes.filter(c => c.status === 'resolved').length
+        },
+        disciplineProgress: {
+          MECH: calculateDisciplineProgress(clashes, 'MECH'),
+          PL: calculateDisciplineProgress(clashes, 'PL'),
+          EL: calculateDisciplineProgress(clashes, 'EL'),
+          FP: calculateDisciplineProgress(clashes, 'FP')
+        },
+        clashes
+      };
+      setCurrentProject(updatedProject);
+    }
+  };
+
+  const calculateDisciplineProgress = (clashes: ClashTask[], discipline: string) => {
+    const disciplineClashes = clashes.filter(c => c.discipline === discipline);
+    return {
+      total: disciplineClashes.length,
+      resolved: disciplineClashes.filter(c => c.status === 'resolved').length
+    };
   };
 
   return (
@@ -68,7 +106,7 @@ const DashboardPage: React.FC = () => {
                 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                   <div className="lg:col-span-2 clash-todo">
-                    <ClashTodoList project={currentProject} />
+                    <ClashTodoList clashes={parsedXmlClashes.length > 0 ? parsedXmlClashes : currentProject.clashes || []} />
                   </div>
                   <div className="lg:col-span-1 clash-progress">
                     <ClashProgressTracker progress={currentProject.disciplineProgress} />
@@ -80,12 +118,12 @@ const DashboardPage: React.FC = () => {
                 </div>
                 
                 <div className="xml-viewer">
-                  <XmlViewer />
+                  <XmlViewer onXmlDataParsed={handleXmlDataParsed} />
                 </div>
 
                 <div className="bcf-exporter">
                   <BcfExporter 
-                    clashes={currentProject.clashes || []} 
+                    clashes={parsedXmlClashes.length > 0 ? parsedXmlClashes : currentProject.clashes || []} 
                     projectName={currentProject.name}
                   />
                 </div>
@@ -100,14 +138,14 @@ const DashboardPage: React.FC = () => {
                   <ClashImageParser />
                 </div>
                 <div className="xml-viewer">
-                  <XmlViewer />
+                  <XmlViewer onXmlDataParsed={handleXmlDataParsed} />
                 </div>
                 <div className="clash-todo">
-                  <ClashTodoList project={currentProject} />
+                  <ClashTodoList clashes={parsedXmlClashes.length > 0 ? parsedXmlClashes : currentProject.clashes || []} />
                 </div>
                 <div className="bcf-exporter">
                   <BcfExporter 
-                    clashes={currentProject.clashes || []} 
+                    clashes={parsedXmlClashes.length > 0 ? parsedXmlClashes : currentProject.clashes || []} 
                     projectName={currentProject.name}
                   />
                 </div>

@@ -1,9 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { XMLParser } from 'fast-xml-parser';
 import Card, { CardHeader, CardContent } from '../ui/Card';
 import { Upload, FileCheck, AlertCircle, BarChart4, ListFilter, X, ChevronDown, ChevronUp } from 'lucide-react';
 import Button from '../ui/Button';
 import ClashAnalysis from './ClashAnalysis';
+import { ClashTask } from '../../types';
+
+interface XmlViewerProps {
+  onXmlDataParsed: (data: any, clashes: ClashTask[]) => void;
+}
 
 interface ClashStats {
   total: number;
@@ -13,7 +18,7 @@ interface ClashStats {
   byElement: Record<string, number>;
 }
 
-const XmlViewer: React.FC = () => {
+const XmlViewer: React.FC<XmlViewerProps> = ({ onXmlDataParsed }) => {
   const [isExpanded, setIsExpanded] = useState(true);
   const [xmlData, setXmlData] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
@@ -21,6 +26,115 @@ const XmlViewer: React.FC = () => {
   const [viewMode, setViewMode] = useState<'raw' | 'analytics'>('analytics');
   const [clashStats, setClashStats] = useState<ClashStats | null>(null);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  const parseClashesToTasks = (data: any): ClashTask[] => {
+    const clashes = data.clashdetective?.batchtest?.clashtests?.clashtest || [];
+    return clashes.map((clash: any) => {
+      // Extract name from attributes or generate unique ID
+      const name = clash['@_name'] || `CLASH-${Math.random().toString(36).substr(2, 9)}`;
+      
+      // Parse location and level information
+      const locationInfo = parseLocationInfo(clash.location || '');
+      
+      // Extract element details
+      const elements = Array.isArray(clash.elements?.element) 
+        ? clash.elements.element 
+        : clash.elements?.element 
+          ? [clash.elements.element] 
+          : [];
+
+      // Get element types and models
+      const elementDetails = elements.map((element: any) => ({
+        type: element['@_type'] || 'Unknown',
+        model: element['@_model'] || 'Unknown',
+        coordinates: element['@_coordinates'] || ''
+      }));
+
+      return {
+        id: name,
+        description: clash.description || `Clash between ${elementDetails.map(e => e.type).join(' and ')}`,
+        discipline: determineDiscipline(clash, elementDetails),
+        severity: determineSeverity(clash),
+        status: (clash['@_status'] || 'new').toLowerCase(),
+        location: locationInfo.location,
+        level: locationInfo.level,
+        date: clash['@_date'] || new Date().toISOString(),
+        modelSource: elementDetails[0]?.model || 'Unknown',
+        elementType: elementDetails[0]?.type || 'Unknown',
+        clashGroup: determineClashGroup(locationInfo.location),
+        assignedTo: clash['@_assigned'] || 'Unassigned',
+        coordinates: elementDetails[0]?.coordinates || ''
+      };
+    });
+  };
+
+  const parseLocationInfo = (location: string) => {
+    const levelMatch = location.match(/(?:level|lvl\.?|floor)\s*(\d+)/i);
+    const level = levelMatch ? `Level ${levelMatch[1]}` : 'Unspecified Level';
+
+    // Clean up location string
+    let cleanLocation = location
+      .replace(/(?:level|lvl\.?|floor)\s*\d+/i, '')
+      .trim()
+      .replace(/^[,-\s]+|[,-\s]+$/g, '');
+
+    if (!cleanLocation) {
+      cleanLocation = level;
+    }
+
+    return {
+      level,
+      location: cleanLocation
+    };
+  };
+
+  const determineDiscipline = (clash: any, elements: any[]): 'MECH' | 'PL' | 'EL' | 'FP' => {
+    const type = clash['@_type']?.toLowerCase() || '';
+    const elementTypes = elements.map(e => e.type.toLowerCase()).join(' ');
+    
+    if (type.includes('mech') || elementTypes.includes('duct') || elementTypes.includes('pipe')) return 'MECH';
+    if (type.includes('plumb') || elementTypes.includes('plumbing')) return 'PL';
+    if (type.includes('elec') || elementTypes.includes('conduit') || elementTypes.includes('cable')) return 'EL';
+    if (type.includes('fire') || elementTypes.includes('sprinkler')) return 'FP';
+    
+    // Default based on element analysis
+    if (elementTypes.includes('hvac')) return 'MECH';
+    if (elementTypes.includes('electrical')) return 'EL';
+    if (elementTypes.includes('water') || elementTypes.includes('sanitary')) return 'PL';
+    
+    return 'MECH'; // Default fallback
+  };
+
+  const determineSeverity = (clash: any): 'high' | 'medium' | 'low' => {
+    const priority = clash['@_priority']?.toLowerCase() || '';
+    const status = clash['@_status']?.toLowerCase() || '';
+    const description = clash.description?.toLowerCase() || '';
+    
+    // Check for critical keywords
+    const criticalTerms = ['critical', 'severe', 'major', 'urgent', 'safety'];
+    const mediumTerms = ['moderate', 'medium', 'minor'];
+    
+    if (priority.includes('high') || criticalTerms.some(term => description.includes(term))) {
+      return 'high';
+    }
+    if (priority.includes('medium') || mediumTerms.some(term => description.includes(term))) {
+      return 'medium';
+    }
+    if (status === 'approved' || status === 'resolved') {
+      return 'low';
+    }
+    
+    return 'medium'; // Default to medium if no clear indicators
+  };
+
+  const determineClashGroup = (location: string): string => {
+    const location_lower = location.toLowerCase();
+    if (location_lower.includes('hallway') || location_lower.includes('corridor')) return 'Hallway Clashes';
+    if (location_lower.includes('shaft') || location_lower.includes('riser')) return 'Riser Shaft';
+    if (location_lower.includes('mechanical') || location_lower.includes('equipment')) return 'Mechanical Room';
+    if (location_lower.includes('office') || location_lower.includes('workspace')) return 'Office Area';
+    return 'General Area';
+  };
 
   const calculateClashStats = (data: any): ClashStats => {
     const stats: ClashStats = {
@@ -81,9 +195,11 @@ const XmlViewer: React.FC = () => {
           attributeNamePrefix: "@_"
         });
         const result = parser.parse(e.target?.result as string);
+        const clashes = parseClashesToTasks(result);
         setXmlData(result);
         setClashStats(calculateClashStats(result));
         setError(null);
+        onXmlDataParsed(result, clashes);
       } catch (err) {
         setError('Failed to parse XML file. Please ensure it is valid XML.');
         setXmlData(null);

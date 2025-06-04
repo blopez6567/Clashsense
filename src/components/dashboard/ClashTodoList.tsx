@@ -1,25 +1,14 @@
 import React, { useState } from 'react';
 import Card, { CardHeader, CardContent } from '../ui/Card';
-import { CheckCircle2, Filter, ChevronRight, Building2, Clock, FileText, Box, Users2, MapPin } from 'lucide-react';
+import { Download, Loader2, AlertTriangle, ChevronDown, ChevronUp, CheckCircle2, Filter, Building2, Clock, FileText, Box, Users2, MapPin } from 'lucide-react';
 import Button from '../ui/Button';
+import { ClashTask } from '../../types';
 
-interface ClashTask {
-  id: string;
-  description: string;
-  discipline: 'MECH' | 'PL' | 'EL' | 'FP';
-  severity: 'high' | 'medium' | 'low';
-  status: 'new' | 'active' | 'approved' | 'resolved' | 'closed' | 'not-an-issue';
-  location: string;
-  level: string;
-  date: string;
-  modelSource: string;
-  elementType: string;
-  clashGroup: string;
-  assignedTo: string;
-  coordinates: string;
+interface ClashTodoListProps {
+  clashes: ClashTask[];
 }
 
-const ClashTodoList: React.FC = () => {
+const ClashTodoList: React.FC<ClashTodoListProps> = ({ clashes }) => {
   const [selectedDisciplines, setSelectedDisciplines] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
   const [expandedDiscipline, setExpandedDiscipline] = useState<string | null>(null);
@@ -100,26 +89,6 @@ const ClashTodoList: React.FC = () => {
     'Emma Davis'
   ];
 
-  // Extended task data with new fields
-  const allTasks: ClashTask[] = [
-    {
-      id: '1',
-      description: 'Ductwork interference with structural beam on Level 3',
-      discipline: 'MECH',
-      severity: 'high',
-      status: 'active',
-      location: 'Level 3 - Grid A-5',
-      level: 'Level 3',
-      date: '2024-03-10',
-      modelSource: 'HVAC_Revit_0523.rvt',
-      elementType: 'Duct',
-      clashGroup: 'Office Area',
-      assignedTo: 'John Smith',
-      coordinates: 'X: 120.5, Y: 45.2, Z: 35.8'
-    },
-    // ... (previous tasks with added fields)
-  ];
-
   const toggleFilter = (
     value: string,
     setter: React.Dispatch<React.SetStateAction<string | null>>,
@@ -158,7 +127,7 @@ const ClashTodoList: React.FC = () => {
     </div>
   );
 
-  const filteredTasks = allTasks.filter(task => {
+  const filteredTasks = clashes.filter(task => {
     const disciplineMatch = expandedDiscipline 
       ? task.discipline === expandedDiscipline
       : selectedDisciplines.length === 0 || selectedDisciplines.includes(task.discipline);
@@ -201,7 +170,6 @@ const ClashTodoList: React.FC = () => {
            assigneeMatch;
   });
 
-  // Show only 4 tasks in preview mode
   const displayedTasks = expandedDiscipline ? filteredTasks : filteredTasks.slice(0, 4);
 
   const getSeverityColor = (severity: string) => {
@@ -345,7 +313,7 @@ const ClashTodoList: React.FC = () => {
                 </div>
                 <div className="ml-4">
                   {task.status === 'resolved' && (
-                    <CheckCircle2 className="text-emerald-500" size={20} />
+                    <CheckCircle2 className="text-emerald-500\" size={20} />
                   )}
                 </div>
               </div>
