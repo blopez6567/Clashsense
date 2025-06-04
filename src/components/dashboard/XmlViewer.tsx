@@ -16,6 +16,15 @@ interface ClashStats {
   byStatus: Record<string, number>;
   byLocation: Record<string, number>;
   byElement: Record<string, number>;
+  byDiscipline: Record<string, number>;
+  bySeverity: Record<string, number>;
+  byLevel: Record<string, number>;
+  byGroup: Record<string, number>;
+  resolutionRate: number;
+  criticalIssues: number;
+  averageClashesPerLevel: number;
+  topLocations: Array<{ location: string; count: number }>;
+  disciplineBreakdown: Array<{ discipline: string; count: number; resolved: number }>;
 }
 
 const XmlViewer: React.FC<XmlViewerProps> = ({ onXmlDataParsed }) => {
@@ -30,20 +39,15 @@ const XmlViewer: React.FC<XmlViewerProps> = ({ onXmlDataParsed }) => {
   const parseClashesToTasks = (data: any): ClashTask[] => {
     const clashes = data.clashdetective?.batchtest?.clashtests?.clashtest || [];
     return clashes.map((clash: any) => {
-      // Extract name from attributes or generate unique ID
       const name = clash['@_name'] || `CLASH-${Math.random().toString(36).substr(2, 9)}`;
-      
-      // Parse location and level information
       const locationInfo = parseLocationInfo(clash.location || '');
       
-      // Extract element details
       const elements = Array.isArray(clash.elements?.element) 
         ? clash.elements.element 
         : clash.elements?.element 
           ? [clash.elements.element] 
           : [];
 
-      // Get element types and models
       const elementDetails = elements.map((element: any) => ({
         type: element['@_type'] || 'Unknown',
         model: element['@_model'] || 'Unknown',
@@ -68,11 +72,67 @@ const XmlViewer: React.FC<XmlViewerProps> = ({ onXmlDataParsed }) => {
     });
   };
 
+  const calculateClashStats = (clashes: ClashTask[]): ClashStats => {
+    const stats: ClashStats = {
+      total: clashes.length,
+      byType: {},
+      byStatus: {},
+      byLocation: {},
+      byElement: {},
+      byDiscipline: {},
+      bySeverity: {},
+      byLevel: {},
+      byGroup: {},
+      resolutionRate: 0,
+      criticalIssues: 0,
+      averageClashesPerLevel: 0,
+      topLocations: [],
+      disciplineBreakdown: []
+    };
+
+    // Calculate basic counts
+    clashes.forEach(clash => {
+      stats.byType[clash.elementType] = (stats.byType[clash.elementType] || 0) + 1;
+      stats.byStatus[clash.status] = (stats.byStatus[clash.status] || 0) + 1;
+      stats.byLocation[clash.location] = (stats.byLocation[clash.location] || 0) + 1;
+      stats.byElement[clash.elementType] = (stats.byElement[clash.elementType] || 0) + 1;
+      stats.byDiscipline[clash.discipline] = (stats.byDiscipline[clash.discipline] || 0) + 1;
+      stats.bySeverity[clash.severity] = (stats.bySeverity[clash.severity] || 0) + 1;
+      stats.byLevel[clash.level] = (stats.byLevel[clash.level] || 0) + 1;
+      stats.byGroup[clash.clashGroup] = (stats.byGroup[clash.clashGroup] || 0) + 1;
+    });
+
+    // Calculate resolution rate
+    const resolvedClashes = clashes.filter(c => c.status === 'resolved').length;
+    stats.resolutionRate = (resolvedClashes / clashes.length) * 100;
+
+    // Count critical issues
+    stats.criticalIssues = clashes.filter(c => c.severity === 'high').length;
+
+    // Calculate average clashes per level
+    const levels = Object.keys(stats.byLevel).length;
+    stats.averageClashesPerLevel = clashes.length / (levels || 1);
+
+    // Get top locations
+    stats.topLocations = Object.entries(stats.byLocation)
+      .map(([location, count]) => ({ location, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5);
+
+    // Calculate discipline breakdown with resolution rates
+    stats.disciplineBreakdown = Object.entries(stats.byDiscipline).map(([discipline, count]) => ({
+      discipline,
+      count,
+      resolved: clashes.filter(c => c.discipline === discipline && c.status === 'resolved').length
+    }));
+
+    return stats;
+  };
+
   const parseLocationInfo = (location: string) => {
     const levelMatch = location.match(/(?:level|lvl\.?|floor)\s*(\d+)/i);
     const level = levelMatch ? `Level ${levelMatch[1]}` : 'Unspecified Level';
 
-    // Clean up location string
     let cleanLocation = location
       .replace(/(?:level|lvl\.?|floor)\s*\d+/i, '')
       .trim()
@@ -97,12 +157,11 @@ const XmlViewer: React.FC<XmlViewerProps> = ({ onXmlDataParsed }) => {
     if (type.includes('elec') || elementTypes.includes('conduit') || elementTypes.includes('cable')) return 'EL';
     if (type.includes('fire') || elementTypes.includes('sprinkler')) return 'FP';
     
-    // Default based on element analysis
     if (elementTypes.includes('hvac')) return 'MECH';
     if (elementTypes.includes('electrical')) return 'EL';
     if (elementTypes.includes('water') || elementTypes.includes('sanitary')) return 'PL';
     
-    return 'MECH'; // Default fallback
+    return 'MECH';
   };
 
   const determineSeverity = (clash: any): 'high' | 'medium' | 'low' => {
@@ -110,7 +169,6 @@ const XmlViewer: React.FC<XmlViewerProps> = ({ onXmlDataParsed }) => {
     const status = clash['@_status']?.toLowerCase() || '';
     const description = clash.description?.toLowerCase() || '';
     
-    // Check for critical keywords
     const criticalTerms = ['critical', 'severe', 'major', 'urgent', 'safety'];
     const mediumTerms = ['moderate', 'medium', 'minor'];
     
@@ -124,7 +182,7 @@ const XmlViewer: React.FC<XmlViewerProps> = ({ onXmlDataParsed }) => {
       return 'low';
     }
     
-    return 'medium'; // Default to medium if no clear indicators
+    return 'medium';
   };
 
   const determineClashGroup = (location: string): string => {
@@ -134,47 +192,6 @@ const XmlViewer: React.FC<XmlViewerProps> = ({ onXmlDataParsed }) => {
     if (location_lower.includes('mechanical') || location_lower.includes('equipment')) return 'Mechanical Room';
     if (location_lower.includes('office') || location_lower.includes('workspace')) return 'Office Area';
     return 'General Area';
-  };
-
-  const calculateClashStats = (data: any): ClashStats => {
-    const stats: ClashStats = {
-      total: 0,
-      byType: {},
-      byStatus: {},
-      byLocation: {},
-      byElement: {}
-    };
-
-    const clashes = data.clashdetective?.batchtest?.clashtests?.clashtest || [];
-    stats.total = clashes.length;
-
-    clashes.forEach((clash: any) => {
-      // Count by type
-      const type = clash['@_type'] || 'Unknown';
-      stats.byType[type] = (stats.byType[type] || 0) + 1;
-
-      // Count by status
-      const status = clash['@_status'] || 'Unknown';
-      stats.byStatus[status] = (stats.byStatus[status] || 0) + 1;
-
-      // Count by location
-      const location = clash.location || 'Unspecified';
-      stats.byLocation[location] = (stats.byLocation[location] || 0) + 1;
-
-      // Count by element type
-      if (clash.elements?.element) {
-        const elements = Array.isArray(clash.elements.element) 
-          ? clash.elements.element 
-          : [clash.elements.element];
-        
-        elements.forEach((element: any) => {
-          const elementType = element['@_type'] || 'Unknown';
-          stats.byElement[elementType] = (stats.byElement[elementType] || 0) + 1;
-        });
-      }
-    });
-
-    return stats;
   };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -197,7 +214,8 @@ const XmlViewer: React.FC<XmlViewerProps> = ({ onXmlDataParsed }) => {
         const result = parser.parse(e.target?.result as string);
         const clashes = parseClashesToTasks(result);
         setXmlData(result);
-        setClashStats(calculateClashStats(result));
+        const stats = calculateClashStats(clashes);
+        setClashStats(stats);
         setError(null);
         onXmlDataParsed(result, clashes);
       } catch (err) {
@@ -257,38 +275,51 @@ const XmlViewer: React.FC<XmlViewerProps> = ({ onXmlDataParsed }) => {
       <div className="space-y-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-6">
-            {renderChart(clashStats.byType, 'Clashes by Type')}
+            {renderChart(clashStats.byDiscipline, 'Clashes by Discipline')}
           </div>
           <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-6">
-            {renderChart(clashStats.byStatus, 'Clashes by Status')}
+            {renderChart(clashStats.bySeverity, 'Clashes by Severity')}
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-6">
-            {renderChart(clashStats.byLocation, 'Clashes by Location')}
+            {renderChart(clashStats.byStatus, 'Clashes by Status')}
           </div>
           <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-6">
-            {renderChart(clashStats.byElement, 'Clashes by Element Type')}
+            {renderChart(clashStats.byGroup, 'Clashes by Group')}
+          </div>
+        </div>
+        <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-6">
+          <h3 className="text-sm font-medium text-slate-900 dark:text-white mb-4">Key Metrics</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="p-4 bg-white dark:bg-slate-700 rounded-lg">
+              <div className="text-sm text-slate-500 dark:text-slate-400">Resolution Rate</div>
+              <div className="text-2xl font-bold text-slate-900 dark:text-white">
+                {clashStats.resolutionRate.toFixed(1)}%
+              </div>
+            </div>
+            <div className="p-4 bg-white dark:bg-slate-700 rounded-lg">
+              <div className="text-sm text-slate-500 dark:text-slate-400">Critical Issues</div>
+              <div className="text-2xl font-bold text-slate-900 dark:text-white">
+                {clashStats.criticalIssues}
+              </div>
+            </div>
+            <div className="p-4 bg-white dark:bg-slate-700 rounded-lg">
+              <div className="text-sm text-slate-500 dark:text-slate-400">Avg. Clashes/Level</div>
+              <div className="text-2xl font-bold text-slate-900 dark:text-white">
+                {clashStats.averageClashesPerLevel.toFixed(1)}
+              </div>
+            </div>
+            <div className="p-4 bg-white dark:bg-slate-700 rounded-lg">
+              <div className="text-sm text-slate-500 dark:text-slate-400">Total Clashes</div>
+              <div className="text-2xl font-bold text-slate-900 dark:text-white">
+                {clashStats.total}
+              </div>
+            </div>
           </div>
         </div>
       </div>
     );
-  };
-
-  const renderValue = (value: any): JSX.Element => {
-    if (typeof value === 'object' && value !== null) {
-      return (
-        <div className="pl-4 border-l-2 border-slate-200 dark:border-slate-700">
-          {Object.entries(value).map(([key, val]) => (
-            <div key={key} className="mt-2">
-              <span className="font-medium text-blue-600 dark:text-blue-400">{key}:</span>
-              {renderValue(val)}
-            </div>
-          ))}
-        </div>
-      );
-    }
-    return <span className="text-slate-700 dark:text-slate-300 ml-2">{value}</span>;
   };
 
   return (
@@ -377,7 +408,9 @@ const XmlViewer: React.FC<XmlViewerProps> = ({ onXmlDataParsed }) => {
                   renderAnalytics()
                 ) : (
                   <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-4 overflow-auto max-h-96">
-                    {renderValue(xmlData)}
+                    <pre className="text-sm text-slate-600 dark:text-slate-400">
+                      {JSON.stringify(xmlData, null, 2)}
+                    </pre>
                   </div>
                 )}
               </div>
